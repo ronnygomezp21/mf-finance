@@ -1,0 +1,145 @@
+<div [formGroup]="form">
+  @if (
+    isMode === modeSelectEnum.COMBO ||
+    (isMode === modeSelectEnum.MIX && listOptions.length > 10)
+  ) {
+    <div class="select-index w-100 m-auto">
+      <div class="form-group simple-select-2 form-floating input-styles">
+        <span
+          #dynamicWidth
+          class="select2 select2-container select2-container--default select2-container--below">
+          <label
+            class="col-form-label label-select"
+            [class.focus-select]="
+              focus ||
+              form.controls['form'].getRawValue() ||
+              control()?.getRawValue()
+            "
+            [ngClass]="{
+              'label-select': form.controls['form'].value || control()?.value,
+              invalidSelect:
+                (form.controls['form'].touched &&
+                  form.controls['form'].errors?.['required']) ||
+                (control()?.touched && control()?.errors?.['required']),
+            }">
+            <p style="overflow: hidden" [style.width]="maxWidthLabel">
+              {{ label }}
+            </p>
+          </label>
+          @if (isArray(validOptions) || firstTime) {
+            <ng-select
+              [notFoundText]="notFoundText"
+              [clearSearchOnAdd]="true"
+              [closeOnSelect]="closeOnSelect()"
+              [searchable]="searchable"
+              [deselectOnClick]="deselectOnClick()"
+              [bindLabel]="bindLabel"
+              [bindValue]="bindValue"
+              [items]="validOptions"
+              [virtualScroll]="true"
+              formControlName="form"
+              [loading]="isLoading"
+              [searchFn]="searchFn"
+              [multiple]="multiple()"
+              (blur)="onBlur()"
+              (focus)="onFocus()"
+              (change)="pushChips($event)"
+              (search)="onSearched($event)"
+              (scrollToEnd)="onScrollToEndLoading()">
+              <ng-template
+                ng-option-tmp
+                let-item="item"
+                let-index="index"
+                let-search="searchTerm">
+                <div class="d-flex w-100 gap-2 align-items-center">
+                  @if (form.get('form')?.getRawValue() === item[bindValue]) {
+                    <div style="height: 24px; width: 24px">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="24"
+                        height="24"
+                        viewBox="0 0 24 24"
+                        fill="none">
+                        <path
+                          d="M20.6644 5.2526C21.0772 5.61952 21.1143 6.25159 20.7474 6.66437L10.0808 18.6644C9.89099 18.8779 9.61898 19 9.33334 19C9.04771 19 8.7757 18.8779 8.58593 18.6644L3.2526 12.6644C2.88568 12.2516 2.92286 11.6195 3.33565 11.2526C3.74843 10.8857 4.3805 10.9229 4.74742 11.3356L9.33334 16.4948L19.2526 5.33565C19.6195 4.92286 20.2516 4.88568 20.6644 5.2526Z"
+                          fill="#00AEEF" />
+                      </svg>
+                    </div>
+                  }
+                  <span
+                    class="d-flex min-w-100p text-truncate"
+                    [class.font-primary]="
+                      form.get('form')?.getRawValue() === item[bindValue]
+                    "
+                    tooltipClass="tooltip-custom"
+                    container="body"
+                    placement="auto"
+                    [ngbTooltip]="item[bindLabel]">
+                    {{ item[bindLabel] }}
+                  </span>
+                </div>
+              </ng-template>
+            </ng-select>
+          }
+          @if (
+            (form.controls['form'].touched &&
+              form.controls['form'].errors?.['required']) ||
+            (control() && control()?.touched && control()?.errors?.['required'])
+          ) {
+            <div class="invalid">
+              <span>
+                @if (errorMessage()) {
+                  {{ errorMessage() }}
+                } @else {
+                  Seleccione una opción
+                }
+              </span>
+            </div>
+          }
+        </span>
+      </div>
+    </div>
+    @if (isMode === modeSelectEnum.MIX) {
+      <div class="row d-flex my-2 gap-10 justify-content-center">
+        <div class="badge-spacing">
+          @if (validOptions) {
+            @for (chip of groupChips; track chip) {
+              @if (chip[bindLabel]) {
+                <span class="tag sent text-nowrap">
+                  <button
+                    (click)="deleteChip(chip)"
+                    class="svg-informativo-circle-error font-white cursor-pointer bg-transparent border-0 p-0 fs-6"></button>
+                  <span
+                    placement="auto"
+                    [ngbTooltip]="chip[bindLabel]"
+                    tooltipClass="tooltip-custom"
+                    class="text-overflow-max">
+                    {{ chip[bindLabel] }}
+                  </span>
+                </span>
+              }
+            }
+          }
+        </div>
+      </div>
+    }
+  } @else {
+    <div class="d-flex gap-10 flex-wrap mb-4 justify-content-center">
+      @for (chip of validOptions; track chip) {
+        @if (chip[bindLabel]) {
+          <button
+            class="flex-flow-wrap filter-chips d-flex"
+            [ngClass]="{ 'selected-chip': validateChip(chip) }"
+            (click)="validateDataPush(chip)">
+            @if (validateChip(chip)) {
+              <i class="svg-funciones-check"></i>
+            }
+            <label class="text-overflow-max" for="">
+              {{ chip[bindLabel] }}
+            </label>
+          </button>
+        }
+      }
+    </div>
+  }
+</div>

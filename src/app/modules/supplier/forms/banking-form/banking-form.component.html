@@ -1,0 +1,346 @@
+<div class="card p-4" [formGroup]="form()">
+
+  <!-- 3 · Forma de pago -->
+  <div class="border rounded p-4 bg-white mb-4">
+    <div class="d-flex align-items-start gap-2 mb-1">
+      <span class="badge rounded-circle bg-dark text-white d-flex align-items-center justify-content-center"
+        style="width:28px; height:28px; font-size:0.8rem;">3</span>
+      <div>
+        <h6 class="fw-bold mb-0" style="font-size:0.95rem;">Forma de pago</h6>
+        <small class="text-muted">Método con el que se pagará al proveedor. La cuenta bancaria es obligatoria si eliges
+          Transferencia.</small>
+      </div>
+    </div>
+
+    <div class="row g-3 mt-2">
+      <!-- Método de pago -->
+      <div class="col-md-6">
+        <label class="form-label fw-semibold" style="font-size:0.82rem;">Método de pago <span
+            class="text-danger">*</span></label>
+        <mf-core-shared-select label="Seleccionar..." [listOptions]="paymentMethods"
+          [control]="$any(form().get('paymentMethod'))" bindLabel="name" bindValue="id" [isRequired]="true">
+        </mf-core-shared-select>
+      </div>
+
+      <!-- Días de pago -->
+      <div class="col-md-6">
+        <label class="form-label fw-semibold" style="font-size:0.82rem;">Días de pago</label>
+        <div class="input-group" style="height:48px;">
+          <input class="form-control" type="number" formControlName="paymentDays" placeholder="Ej. 30"
+            style="height:48px;" />
+          <span class="input-group-text bg-white text-muted" style="font-size:0.82rem; height:48px;">días</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3b · Datos bancarios (condicional Transferencia) -->
+  @if (isTransferencia) {
+  <div class="border rounded p-4 bg-white mb-4">
+    <div class="d-flex align-items-start gap-2 mb-1">
+      <span class="badge rounded-pill bg-secondary text-white" style="font-size:0.75rem;">3b</span>
+      <div>
+        <h6 class="fw-bold mb-0" style="font-size:0.95rem;">Datos bancarios</h6>
+        <small class="text-muted">Cuenta donde se acreditarán los pagos por transferencia.</small>
+      </div>
+    </div>
+
+    <div class="row g-3 mt-2">
+      <div class="col-md-4">
+        <label class="form-label fw-semibold" style="font-size:0.82rem;">País del banco <span
+            class="text-danger">*</span></label>
+        <mf-core-shared-select label="Seleccionar..." [listOptions]="countries"
+          [control]="$any(form().get('bankCountry'))" bindLabel="name" bindValue="id" [isRequired]="true"
+          [setData]="defaultCountryId">
+        </mf-core-shared-select>
+      </div>
+
+      <div class="col-md-4">
+        <label class="form-label fw-semibold" style="font-size:0.82rem;">Moneda <span
+            class="text-danger">*</span></label>
+        <mf-core-shared-select label="Seleccionar..." [listOptions]="currencies"
+          [control]="$any(form().get('currency'))" bindLabel="name" bindValue="id" [isRequired]="true"
+          [setData]="defaultCurrencyId">
+        </mf-core-shared-select>
+      </div>
+
+      <div class="col-md-4">
+        <label class="form-label fw-semibold" style="font-size:0.82rem;">Clasificador ID Banco <span
+            class="text-danger">*</span></label>
+        <div class="input-group" style="height:48px;">
+          <input class="form-control" formControlName="bankIdClassifier" placeholder="022" style="height:48px;"
+            [ngClass]="{'is-invalid': form().get('bankIdClassifier')?.touched && form().get('bankIdClassifier')?.hasError('required')}" />
+          <span class="input-group-text bg-white text-muted" style="font-size:0.82rem; height:48px;">Bancos de Ecuador</span>
+        </div>
+        @if (form().get('bankIdClassifier')?.touched && form().get('bankIdClassifier')?.hasError('required')) {
+          <small class="text-danger"><i class="bi bi-exclamation-circle me-1"></i>Campo obligatorio.</small>
+        }
+      </div>
+
+      <!-- Banco local (select) — solo residentes nacionales -->
+      @if (!isForeignResidency()) {
+        <div class="col-md-4">
+          <label class="form-label fw-semibold" style="font-size:0.82rem;">Banco <span
+              class="text-danger">*</span></label>
+          <mf-core-shared-select label="Seleccionar..." [listOptions]="bankNames" [control]="$any(form().get('bankName'))"
+            bindLabel="name" bindValue="id" [isRequired]="true">
+          </mf-core-shared-select>
+        </div>
+      }
+
+      <!-- Banco exterior (texto libre) — solo residentes extranjeros -->
+      @if (isForeignResidency()) {
+        <div class="col-md-4">
+          <label class="form-label fw-semibold" style="font-size:0.82rem;">Banco (exterior) <span
+              class="text-danger">*</span></label>
+          <input class="form-control" formControlName="bankNameForeign" placeholder="Nombre del banco exterior" style="height:48px;"
+            [ngClass]="{'is-invalid': form().get('bankNameForeign')?.touched && form().get('bankNameForeign')?.hasError('required')}" />
+          @if (form().get('bankNameForeign')?.touched && form().get('bankNameForeign')?.hasError('required')) {
+            <small class="text-danger"><i class="bi bi-exclamation-circle me-1"></i>Campo obligatorio.</small>
+          }
+        </div>
+      }
+
+      <div class="col-md-4">
+        <label class="form-label fw-semibold" style="font-size:0.82rem;">Tipo de cuenta <span
+            class="text-danger">*</span></label>
+        <mf-core-shared-select label="Seleccionar..." [listOptions]="accountTypes"
+          [control]="$any(form().get('accountType'))" bindLabel="name" bindValue="id" [isRequired]="true">
+        </mf-core-shared-select>
+      </div>
+
+      <div class="col-md-4">
+        <label class="form-label fw-semibold" style="font-size:0.82rem;">Número de cuenta <span
+            class="text-danger">*</span></label>
+        <input class="form-control" type="number" formControlName="accountNumber" placeholder="Número de cuenta" style="height:48px;"
+          [ngClass]="{'is-invalid': form().get('accountNumber')?.touched && form().get('accountNumber')?.hasError('required')}" />
+        @if (form().get('accountNumber')?.touched && form().get('accountNumber')?.hasError('required')) {
+        <small class="text-danger"><i class="bi bi-exclamation-circle me-1"></i>Campo obligatorio.</small>
+        }
+      </div>
+
+      <div class="col-md-4">
+        <label class="form-label fw-semibold" style="font-size:0.82rem;">Titular de la cuenta <span
+            class="text-danger">*</span></label>
+        <input class="form-control" formControlName="accountHolder" placeholder="Nombre del titular"
+          style="height:48px;"
+          [ngClass]="{'is-invalid': form().get('accountHolder')?.touched && form().get('accountHolder')?.hasError('required')}" />
+        @if (form().get('accountHolder')?.touched && form().get('accountHolder')?.hasError('required')) {
+        <small class="text-danger"><i class="bi bi-exclamation-circle me-1"></i>Campo obligatorio.</small>
+        }
+      </div>
+
+      <div class="col-md-4">
+        <label class="form-label fw-semibold" style="font-size:0.82rem;">Tipo de ID de pago <span
+            class="text-danger">*</span></label>
+        <mf-core-shared-select label="Seleccionar..." [listOptions]="paymentIdTypes"
+          [control]="$any(form().get('paymentIdType'))" bindLabel="name" bindValue="id" [isRequired]="true">
+        </mf-core-shared-select>
+      </div>
+
+      <div class="col-md-4">
+        <label class="form-label fw-semibold" style="font-size:0.82rem;">ID de pago <span
+            class="text-danger">*</span></label>
+        <input class="form-control" formControlName="paymentId" placeholder="Identificación" style="height:48px;"
+          [ngClass]="{'is-invalid': form().get('paymentId')?.touched && form().get('paymentId')?.hasError('required')}" />
+        @if (form().get('paymentId')?.touched && form().get('paymentId')?.hasError('required')) {
+          <small class="text-danger"><i class="bi bi-exclamation-circle me-1"></i>Campo obligatorio.</small>
+        }
+      </div>
+
+      <!-- ¿Pago a un tercero? -->
+      <div class="col-md-4">
+        <label class="form-label fw-semibold" style="font-size:0.82rem;">¿Pago a un tercero?</label>
+        <mf-core-shared-select label="Seleccionar..." [listOptions]="yesNoOptions"
+          [control]="$any(form().get('thirdPartyPayment'))" bindLabel="name" bindValue="id"
+          [setData]="defaultNoId">
+        </mf-core-shared-select>
+      </div>
+
+      <!-- ¿Pagos al exterior? -->
+      <div class="col-md-4">
+        <label class="form-label fw-semibold" style="font-size:0.82rem;">¿Pagos al exterior?</label>
+        <mf-core-shared-select label="Seleccionar..." [listOptions]="yesNoOptions"
+          [control]="$any(form().get('externalPayment'))" bindLabel="name" bindValue="id"
+          [setData]="defaultNoId">
+        </mf-core-shared-select>
+      </div>
+    </div>
+
+    <!-- Advertencia: titular ≠ razón social -->
+    @if (holderMismatch) {
+      <div class="alert alert-warning d-flex align-items-start gap-2 mt-3 mb-0 py-2 px-3" role="alert"
+        style="font-size:0.82rem; border-radius:6px;">
+        <i class="bi bi-exclamation-circle-fill mt-1"></i>
+        <span>El titular de la cuenta no coincide con la razón social del proveedor. Verifica que sea correcto (se permite, pero queda registrado como advertencia).</span>
+      </div>
+    }
+  </div>
+  }
+
+  <!-- 3c · Correos para notificaciones de pago -->
+  <div class="border rounded p-4 bg-white mb-4">
+    <div class="d-flex align-items-start gap-2 mb-1">
+      <span class="badge rounded-pill bg-secondary text-white" style="font-size:0.75rem;">3c</span>
+      <div>
+        <h6 class="fw-bold mb-0" style="font-size:0.95rem;">Correos para notificaciones de pago</h6>
+        <small class="text-muted">Direcciones a las que se enviarán los comprobantes de pago y retenciones
+          (RN-05).</small>
+      </div>
+    </div>
+
+    <div class="row g-3 mt-2">
+      <div class="col-md-6">
+        <label class="form-label fw-semibold" style="font-size:0.82rem;">Correo de pagos 1 <span
+            class="text-danger">*</span></label>
+        <input class="form-control" type="email" formControlName="paymentEmail1" placeholder="pagos@dominio.com"
+          style="height:48px;"
+          [ngClass]="{'is-invalid': form().get('paymentEmail1')?.touched && form().get('paymentEmail1')?.hasError('required')}" />
+        @if (form().get('paymentEmail1')?.touched && form().get('paymentEmail1')?.hasError('required')) {
+        <small class="text-danger"><i class="bi bi-exclamation-circle me-1"></i>Campo obligatorio.</small>
+        }
+      </div>
+      <div class="col-md-6">
+        <label class="form-label fw-semibold" style="font-size:0.82rem;">Correo de pagos 2</label>
+        <input class="form-control" type="email" formControlName="paymentEmail2" placeholder="Opcional"
+          style="height:48px;" />
+      </div>
+    </div>
+  </div>
+
+  <!-- 3d · Datos del pago a un tercero (condicional SI) -->
+  @if (isThirdPartyPayment) {
+    <div class="border rounded p-4 bg-white mb-4">
+      <div class="d-flex align-items-start gap-2 mb-3">
+        <span class="badge rounded-pill bg-secondary text-white" style="font-size:0.75rem;">3d</span>
+        <h6 class="fw-bold mb-0 text-primary" style="font-size:0.9rem; text-transform:uppercase;">Datos del pago a un tercero</h6>
+      </div>
+
+      <!-- Beneficiario (full width) -->
+      <div class="row g-3 mb-3">
+        <div class="col-12">
+          <label class="form-label fw-semibold" style="font-size:0.82rem;">Beneficiario <span class="text-danger">*</span></label>
+          <input class="form-control" formControlName="tpBeneficiary" placeholder="Nombre del tercero beneficiario" style="height:48px;"
+            [ngClass]="{'is-invalid': form().get('tpBeneficiary')?.touched && form().get('tpBeneficiary')?.hasError('required')}" />
+          @if (form().get('tpBeneficiary')?.touched && form().get('tpBeneficiary')?.hasError('required')) {
+            <small class="text-danger"><i class="bi bi-exclamation-circle me-1"></i>Campo obligatorio.</small>
+          }
+        </div>
+      </div>
+
+      <!-- Tipo de identificación (select) + ID de pago -->
+      <div class="row g-3 mb-3">
+        <div class="col-md-6">
+          <label class="form-label fw-semibold" style="font-size:0.82rem;">Tipo de identificación</label>
+          <mf-core-shared-select label="Seleccionar..." [listOptions]="paymentIdTypes"
+            [control]="$any(form().get('tpIdentificationType'))" bindLabel="name" bindValue="id">
+          </mf-core-shared-select>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label fw-semibold" style="font-size:0.82rem;">ID de pago <span class="text-danger">*</span></label>
+          <input class="form-control" formControlName="tpPaymentId" placeholder="Cédula o RUC del tercero" style="height:48px;"
+            [ngClass]="{'is-invalid': form().get('tpPaymentId')?.touched && form().get('tpPaymentId')?.hasError('required')}" />
+          @if (form().get('tpPaymentId')?.touched && form().get('tpPaymentId')?.hasError('required')) {
+            <small class="text-danger"><i class="bi bi-exclamation-circle me-1"></i>Campo obligatorio.</small>
+          }
+        </div>
+      </div>
+
+      <!-- Banco (select) + Tipo de cuenta (select) -->
+      <div class="row g-3 mb-3">
+        <div class="col-md-6">
+          <label class="form-label fw-semibold" style="font-size:0.82rem;">Banco <span class="text-danger">*</span></label>
+          <mf-core-shared-select label="Seleccionar..." [listOptions]="bankNames"
+            [control]="$any(form().get('tpBankName'))" bindLabel="name" bindValue="id" [isRequired]="true">
+          </mf-core-shared-select>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label fw-semibold" style="font-size:0.82rem;">Tipo de cuenta <span class="text-danger">*</span></label>
+          <mf-core-shared-select label="Seleccionar..." [listOptions]="accountTypes"
+            [control]="$any(form().get('tpAccountType'))" bindLabel="name" bindValue="id" [isRequired]="true">
+          </mf-core-shared-select>
+        </div>
+      </div>
+
+      <!-- Número de cuenta -->
+      <div class="row g-3">
+        <div class="col-md-6">
+          <label class="form-label fw-semibold" style="font-size:0.82rem;">Número de cuenta <span class="text-danger">*</span></label>
+          <input class="form-control" type="number" formControlName="tpAccountNumber" placeholder="6 a 20 dígitos" style="height:48px;"
+            [ngClass]="{'is-invalid': form().get('tpAccountNumber')?.touched && form().get('tpAccountNumber')?.hasError('required')}" />
+          @if (form().get('tpAccountNumber')?.touched && form().get('tpAccountNumber')?.hasError('required')) {
+            <small class="text-danger"><i class="bi bi-exclamation-circle me-1"></i>Campo obligatorio.</small>
+          }
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- 3e · Datos de pago al exterior (condicional SI) -->
+  @if (isExternalPayment) {
+    <div class="border rounded p-4 bg-white mb-4">
+      <div class="d-flex align-items-start gap-2 mb-3">
+        <span class="badge rounded-pill bg-secondary text-white" style="font-size:0.75rem;">3e</span>
+        <h6 class="fw-bold mb-0 text-primary" style="font-size:0.9rem; text-transform:uppercase;">Datos de pago al exterior</h6>
+      </div>
+
+      <!-- Código SWIFT + Gastos de envío (select) -->
+      <div class="row g-3 mb-3">
+        <div class="col-md-6">
+          <label class="form-label fw-semibold" style="font-size:0.82rem;">Código SWIFT <span class="text-danger">*</span></label>
+          <input class="form-control" formControlName="epSwiftCode" placeholder="Ej. PICHEC EQ" style="height:48px;"
+            [ngClass]="{'is-invalid': form().get('epSwiftCode')?.touched && form().get('epSwiftCode')?.hasError('required')}" />
+          @if (form().get('epSwiftCode')?.touched && form().get('epSwiftCode')?.hasError('required')) {
+            <small class="text-danger"><i class="bi bi-exclamation-circle me-1"></i>Campo obligatorio.</small>
+          }
+        </div>
+        <div class="col-md-6">
+          <label class="form-label fw-semibold" style="font-size:0.82rem;">Gastos de envío <span class="text-danger">*</span></label>
+          <mf-core-shared-select label="Seleccionar..." [listOptions]="shippingCosts"
+            [control]="$any(form().get('epShippingCosts'))" bindLabel="name" bindValue="id" [isRequired]="true">
+          </mf-core-shared-select>
+        </div>
+      </div>
+
+      <!-- Referencia + Relación con el ordenante (select) -->
+      <div class="row g-3 mb-3">
+        <div class="col-md-6">
+          <label class="form-label fw-semibold" style="font-size:0.82rem;">Referencia <span class="text-danger">*</span></label>
+          <input class="form-control" formControlName="epReference" placeholder="Referencia del pago" style="height:48px;"
+            [ngClass]="{'is-invalid': form().get('epReference')?.touched && form().get('epReference')?.hasError('required')}" />
+          @if (form().get('epReference')?.touched && form().get('epReference')?.hasError('required')) {
+            <small class="text-danger"><i class="bi bi-exclamation-circle me-1"></i>Campo obligatorio.</small>
+          }
+        </div>
+        <div class="col-md-6">
+          <label class="form-label fw-semibold" style="font-size:0.82rem;">Relación con el ordenante <span class="text-danger">*</span></label>
+          <mf-core-shared-select label="Seleccionar..." [listOptions]="relationshipTypes"
+            [control]="$any(form().get('epRelationship'))" bindLabel="name" bindValue="id" [isRequired]="true">
+          </mf-core-shared-select>
+        </div>
+      </div>
+
+      <!-- ¿Tiene banco intermediario? (select SI/NO) + Código SWIFT intermediario (condicional) -->
+      <div class="row g-3">
+        <div class="col-md-6">
+          <label class="form-label fw-semibold" style="font-size:0.82rem;">¿Tiene banco intermediario?</label>
+          <mf-core-shared-select label="Seleccionar..." [listOptions]="yesNoOptions"
+            [control]="$any(form().get('epHasIntermediaryBank'))" bindLabel="name" bindValue="id"
+            [setData]="defaultNoId">
+          </mf-core-shared-select>
+        </div>
+        @if (isIntermediaryBank) {
+          <div class="col-md-6">
+            <label class="form-label fw-semibold" style="font-size:0.82rem;">Código SWIFT banco intermediario <span class="text-danger">*</span></label>
+            <input class="form-control" formControlName="epIntermediarySwiftCode" placeholder="SWIFT del intermediario" style="height:48px;"
+              [ngClass]="{'is-invalid': form().get('epIntermediarySwiftCode')?.touched && form().get('epIntermediarySwiftCode')?.hasError('required')}" />
+            @if (form().get('epIntermediarySwiftCode')?.touched && form().get('epIntermediarySwiftCode')?.hasError('required')) {
+              <small class="text-danger"><i class="bi bi-exclamation-circle me-1"></i>Campo obligatorio.</small>
+            }
+          </div>
+        }
+      </div>
+    </div>
+  }
+
+</div>

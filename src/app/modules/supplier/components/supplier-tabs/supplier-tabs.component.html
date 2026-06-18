@@ -1,0 +1,17 @@
+<ul class="nav nav-tabs mb-4" role="tablist">
+  @for (label of tabLabels(); track $index) {
+    <li class="nav-item" role="presentation">
+      <button
+        class="nav-link"
+        [class.active]="activeTab() === $index"
+        [class.disabled]="tabDisabled()[$index]"
+        [attr.aria-selected]="activeTab() === $index"
+        (click)="onTabClick($index)"
+        type="button"
+        role="tab">
+        <span class="tab-number me-1">{{ $index + 1 }}</span>
+        {{ label }}
+      </button>
+    </li>
+  }
+</ul>

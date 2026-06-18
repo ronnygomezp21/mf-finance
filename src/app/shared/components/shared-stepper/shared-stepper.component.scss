@@ -1,0 +1,76 @@
+.stepper-container {
+  width: 100%;
+
+  .stepper-header {
+    /* Ocultar la barra de desplazamiento gruesa manteniendo la funcionalidad de scroll */
+    &::-webkit-scrollbar {
+      display: none;
+    }
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
+    
+    .stepper-tab {
+      padding: 1rem 0.75rem;
+      font-weight: 500;
+      color: #6c757d; /* text-muted equivalent */
+      cursor: pointer;
+      position: relative;
+      white-space: nowrap;
+      transition: color 0.3s ease;
+
+      &:hover {
+        color: #495057;
+      }
+
+      &.active {
+        color: #003366; /* Un azul oscuro como en la imagen */
+        font-weight: 600;
+
+        &::after {
+          content: '';
+          position: absolute;
+          bottom: -1px;
+          left: 0;
+          width: 100%;
+          height: 3px;
+          background-color: #00a0df; /* El azul claro (celeste) de la barra inferior de la imagen */
+          border-radius: 3px 3px 0 0;
+        }
+      }
+
+      &.completed {
+        cursor: pointer;
+        /* Estilos adicionales si se desea marcar los completados visualmente */
+      }
+    }
+  }
+
+  .stepper-content {
+    background-color: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    border: 1px solid #f0f0f0;
+    
+    .step-dynamic-header {
+      .step-circle {
+        width: 32px;
+        height: 32px;
+        background-color: #0b1a30; /* Color oscuro similar a la imagen */
+        font-size: 14px;
+      }
+      .step-title {
+        color: #0b1a30;
+        font-size: 1.1rem; /* Reduciendo tamaño del título */
+      }
+      .step-description {
+        color: #8f9bb3; /* Gris claro para el subtitulo */
+        font-size: 0.85rem; /* Reduciendo tamaño del subtítulo */
+      }
+    }
+  }
+
+  .stepper-footer {
+    min-height: 200px; /* Para que no salte el layout drásticamente */
+    padding: 1rem 0;
+  }
+}

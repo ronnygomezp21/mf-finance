@@ -1,11 +1,13 @@
 import { Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
+import { SharedModule } from './shared/shared.module';
+import { NgSelectModule } from '@ng-select/ng-select';
 
 @Component({
-  selector: 'app-root',
-  imports: [RouterOutlet],
+  selector: 'mf-finance-root',
+  standalone: true,
+  imports: [RouterOutlet, SharedModule, NgSelectModule],
   templateUrl: './app.component.html',
-  styleUrl: './app.component.scss'
 })
 export class AppComponent {
   title = 'mf-finance';

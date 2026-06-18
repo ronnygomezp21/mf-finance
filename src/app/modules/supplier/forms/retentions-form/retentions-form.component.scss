@@ -1,0 +1,15 @@
+@import '../form-shared';
+
+.table {
+  font-size: 0.88rem;
+
+  thead th {
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    color: #6c757d;
+  }
+}
+
+.badge { font-weight: 500; font-size: 0.8rem; }

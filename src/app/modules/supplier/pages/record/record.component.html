@@ -1,0 +1,83 @@
+<div class="record-container">
+  <!-- Header -->
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h4 class="mb-0 fw-bold">Nuevo Proveedor</h4>
+    <span class="badge bg-success px-3 py-2">Activo</span>
+  </div>
+
+  <!-- Tabs -->
+  <mf-finance-supplier-tabs
+    [tabLabels]="tabLabels"
+    [activeTab]="activeTab"
+    [tabDisabled]="tabDisabled"
+    (tabChange)="onTabChange($event)">
+  </mf-finance-supplier-tabs>
+
+  <!-- Tab 1 — Datos Generales -->
+  @if (activeTab === 0) {
+    <mf-finance-supplier-general-form [form]="generalForm"></mf-finance-supplier-general-form>
+  }
+
+  <!-- Tab 2 — Datos Fiscales -->
+  @if (activeTab === 1) {
+    <mf-finance-supplier-fiscal-form [form]="fiscalForm" [isLegalEntity]="isLegalEntity" [isForeignResidency]="isForeignResidency"></mf-finance-supplier-fiscal-form>
+  }
+
+  <!-- Tab 3 — Datos Bancarios -->
+  @if (activeTab === 2) {
+    <mf-finance-supplier-banking-form [form]="bankingForm"
+      [supplierName]="generalForm.get('name')?.value"
+      [isForeignResidency]="isForeignResidency"
+      [supplierIdentification]="generalForm.get('identification')?.value"
+      [supplierIdentificationType]="generalForm.get('identificationType')?.value">
+    </mf-finance-supplier-banking-form>
+  }
+
+  <!-- Tab 4 — Datos de Contacto -->
+  @if (activeTab === 3) {
+    <mf-finance-supplier-contacts-form [form]="contactsForm"></mf-finance-supplier-contacts-form>
+  }
+
+  <!-- Tab 5 — Cupo asignado -->
+  @if (activeTab === 4) {
+    <mf-finance-supplier-quota-form
+      [form]="quotaForm"
+      [isFrequencyOccasional]="isFrequencyOccasional"
+      [isFrequencyPermanent]="isFrequencyPermanent">
+    </mf-finance-supplier-quota-form>
+  }
+
+  <!-- Tab 6 — Retenciones -->
+  @if (activeTab === 5) {
+    <mf-finance-supplier-retentions-form
+      [isSubmitting]="isSubmitting"
+      (submit)="onSubmit($event)">
+    </mf-finance-supplier-retentions-form>
+  }
+
+  <!-- Botones de navegación (fuera de los forms) -->
+  <div class="d-flex justify-content-end gap-2 mt-4 pt-3 border-top">
+    @if (activeTab === 0) {
+      <button class="btn btn-outline-secondary d-flex align-items-center justify-content-center" (click)="cancel()">
+        Cancelar
+      </button>
+    }
+    @if (activeTab > 0) {
+      <button class="btn btn-outline-secondary d-flex align-items-center justify-content-center" (click)="prevTab()">
+        <i class="bi bi-chevron-left me-1"></i>Atrás
+      </button>
+    }
+    @if (activeTab < tabLabels.length - 1) {
+      <button class="btn btn-primary d-flex align-items-center justify-content-center" (click)="nextTab()">
+        Continuar
+      </button>
+    }
+    @if (activeTab === tabLabels.length - 1) {
+      <button
+        class="btn btn-success d-flex align-items-center justify-content-center"
+        (click)="onSubmitFromButton()">
+        <i class="bi bi-check-lg me-1"></i>Guardar proveedor
+      </button>
+    }
+  </div>
+</div>

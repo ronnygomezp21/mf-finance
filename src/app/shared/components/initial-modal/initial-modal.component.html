@@ -1,0 +1,24 @@
+<section class="shared-confirm-modal-section">
+  <div class="modal-head">
+    <span class="title">Aprobar certificados</span>
+    <!-- <span class="sub--title">Tienes {{num_certificados}}certificados por aprobar</span> -->
+    <span class="sub--title">
+      Tienes
+      <b style="font-weight: 900">{{ certificates }} certificados</b>
+      por aprobar
+    </span>
+    <p class="sub--title--two">
+      Solicitudes de autorización
+      <br />
+      {{ dateRange }}
+    </p>
+  </div>
+
+  <div class="footer-modal">
+    <div class="footer-btn-container">
+      <button type="button" (click)="approve()" class="btn btn-primary">
+        Aprobar todos
+      </button>
+    </div>
+  </div>
+</section>

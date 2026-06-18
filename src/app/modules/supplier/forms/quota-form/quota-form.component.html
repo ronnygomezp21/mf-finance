@@ -1,0 +1,85 @@
+<div>
+
+  @if (isFrequencyOccasional()) {
+    <div class="border rounded p-4 bg-white mb-4" [formGroup]="form()">
+      <div class="d-flex align-items-start gap-2 mb-3">
+        <span class="badge rounded-pill bg-primary text-white d-flex align-items-center justify-content-center"
+          style="width:28px; height:28px; font-size:0.8rem;">5</span>
+        <div>
+          <h6 class="fw-bold mb-0" style="font-size:0.95rem;">Cupo de facturación</h6>
+          <small class="text-muted">Monto máximo que el proveedor ocasional puede facturar. Por defecto $3.000, modificable (RN-08).</small>
+        </div>
+      </div>
+
+      <!-- Cupo asignado + Total facturado -->
+      <div class="row g-3 mb-4">
+        <div class="col-md-6">
+          <label class="form-label fw-semibold" style="font-size:0.82rem;">Cupo asignado <span class="text-danger">*</span></label>
+          <div class="input-group" style="height:48px;">
+            <span class="input-group-text">$</span>
+            <input class="form-control" type="number" formControlName="quotaAssigned" style="height:48px;"
+              [ngClass]="{'is-invalid': form().get('quotaAssigned')?.touched && form().get('quotaAssigned')?.hasError('required')}" />
+          </div>
+          @if (form().get('quotaAssigned')?.touched && form().get('quotaAssigned')?.hasError('required')) {
+            <small class="text-danger"><i class="bi bi-exclamation-circle me-1"></i>El cupo de facturación es obligatorio para proveedores ocasionales (RN-08).</small>
+          }
+        </div>
+        <div class="col-md-6">
+          <label class="form-label fw-semibold" style="font-size:0.82rem;">Total facturado</label>
+          <div class="d-flex align-items-center gap-2 bg-light rounded px-3" style="height:48px;">
+            <i class="bi bi-lock-fill text-muted"></i>
+            <span class="fw-bold">$0,00</span>
+            <small class="text-muted">se alimenta de las facturas registradas</small>
+          </div>
+        </div>
+      </div>
+
+      <!-- Barra indicadora del cupo usado -->
+      <div class="progress mb-2" style="height:6px;">
+        <div class="progress-bar bg-success" role="progressbar" style="width:0%;" aria-valuenow="0" [attr.aria-valuemax]="quotaAssignedValue"></div>
+      </div>
+
+      <!-- Usado / Disponible -->
+      <div class="d-flex justify-content-between px-1">
+        <div>
+          <small class="text-muted">Usado:</small>
+          <span class="fw-semibold ms-1">$0,00</span>
+        </div>
+        <div>
+          <small class="text-muted">Disponible:</small>
+          <span class="fw-semibold ms-1">${{ quotaAssignedValue | number:'1.2-2' }}</span>
+        </div>
+      </div>
+    </div>
+
+  } @else if (isFrequencyPermanent()) {
+    <div class="border rounded p-4 bg-white mb-4">
+      <div class="d-flex align-items-start gap-2 mb-3">
+        <span class="badge rounded-pill bg-primary text-white d-flex align-items-center justify-content-center"
+          style="width:28px; height:28px; font-size:0.8rem;">5</span>
+        <div>
+          <h6 class="fw-bold mb-0" style="font-size:0.95rem;">Cupo de facturación</h6>
+        </div>
+      </div>
+      <div class="d-flex align-items-start gap-3 py-3 px-4 bg-light rounded border">
+        <i class="bi bi-info-circle-fill text-primary fs-5 mt-1"></i>
+        <span class="text-muted" style="font-size:0.9rem;">El proveedor está marcado como <strong>Permanente</strong> en Datos Generales, por lo que el cupo de facturación no aplica. Cámbialo a <strong>Ocasional</strong> si necesitas asignar un cupo.</span>
+      </div>
+    </div>
+
+  } @else {
+    <div class="border rounded p-4 bg-white mb-4">
+      <div class="d-flex align-items-start gap-2 mb-3">
+        <span class="badge rounded-pill bg-primary text-white d-flex align-items-center justify-content-center"
+          style="width:28px; height:28px; font-size:0.8rem;">5</span>
+        <div>
+          <h6 class="fw-bold mb-0" style="font-size:0.95rem;">Cupo de facturación</h6>
+        </div>
+      </div>
+      <div class="alert alert-secondary mb-0" role="alert">
+        <i class="bi bi-exclamation-triangle me-2"></i>Selecciona la frecuencia del proveedor en el tab de Datos Generales para configurar el cupo.
+      </div>
+    </div>
+  }
+
+</div>

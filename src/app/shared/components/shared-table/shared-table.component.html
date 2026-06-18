@@ -1,0 +1,290 @@
+<div class="col-md-12 project-list">
+  @if (filter || button || optionsFilter) {
+  <div [ngClass]="{
+        card: useCards,
+      }">
+    @if (filter) {
+    <form [formGroup]="searchForm">
+      <div class="row">
+        <div class="col-5">
+          <div class="">
+            <div class="input-group form-input input-styles search-input">
+              <input [maxLength]="100" id="table-complete-search" type="text" placeholder="Buscar..."
+                class="form-control" name="searchTerm" autocomplete="off" formControlName="search" />
+              @if (searchValue !== '') {
+              <div class="iconInput" (click)="resetSearch()">
+                <i class="svg-informativo-circle-error icon-search"></i>
+              </div>
+              }
+              <button class="btn btn-sm btn-secondary mt-1 ms-2 rounded" (click)="emitOpenFilterModal()">
+                <i class="svg-funciones-filter font-primary"></i>
+                Filtro
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-7 mt-1 justify-content-end">
+          <div>
+            @if (button) {
+            <button class="btn" (click)="emitAddFormEvent()" [ngClass]="{
+                      'btn-primary': addButtonStyle === 'Primary',
+                      'btn-secondary': addButtonStyle === 'Secondary',
+                    }">
+              {{ addButton }}
+            </button>
+            }
+          </div>
+        </div>
+      </div>
+    </form>
+    }
+  </div>
+  }
+  @if (tableData.length > 0) {
+  <div [ngClass]="{
+        card: useCards,
+      }">
+    <div class="table-responsive custom-scrollbar">
+      <div class="card-body">
+        <table class="table">
+          <thead>
+            <tr>
+              @if (tableActions.length > 0) {
+              <th scope="col">Acciones</th>
+              }
+              @for (column of tableColumns; track column) {
+              <th scope="col">
+                <p href="" class="text-header" (click)="sortTable(column.dataKey)">
+                  {{ column.name }}
+                  @if (
+                  column.dataKey != 'index' && column.type != 'status'
+                  ) {
+                  @if (sortOrder == 'asc') {
+                  <i class="svg-flechas-caret-up sortable-Icon"></i>
+                  }
+                  @if (
+                  sortOrder == 'desc' &&
+                  lastIndexOrder != column.dataKey
+                  ) {
+                  <i class="svg-flechas-caret-up sortable-Icon"></i>
+                  }
+                  @if (
+                  sortOrder == 'desc' &&
+                  lastIndexOrder == column.dataKey
+                  ) {
+                  <i class="svg-flechas-caret-down sortable-Icon"></i>
+                  }
+                  }
+                </p>
+              </th>
+              }
+            </tr>
+          </thead>
+          <tbody>
+            @if (validAction) {
+            @for (
+            rowData of tableData;
+            track rowData.id || $index;
+            let idx = $index
+            ) {
+            <tr>
+              @if (tableActions.length > 0) {
+              <td>
+                <ul class="action">
+                  @for (action of tableActions; track action) {
+                  @switch (action) {
+                  @case ('details') {
+                  <a class="nav-link active" id="top-home-tab" (click)="emitRowAction(rowData, action)">
+                    <i data-container="body" placement="top" ngbTooltip="Detalles" tooltipClass="tooltip-custom"
+                      class="svg-funciones-eye icon-md-2 me-2"></i>
+                  </a>
+                  }
+                  @case ('rol') {
+                  <a class="nav-link active" id="top-home-tab" [ngClass]="{ 'active show': rowData.status }"
+                    (click)="emitRowAction(rowData, action)">
+                    <i data-container="body" placement="top" ngbTooltip="Roles" tooltipClass="tooltip-custom"
+                      class="svg-objetos-clipboard-check icon-md me-2"></i>
+                  </a>
+                  }
+                  @case ('disable') {
+                  <div class="position-relative edit-action">
+                    <div class="m-0 mt-1" data-container="body" placement="top" ngbTooltip="{{
+                                      rowData.status ? 'Inactivar' : 'Activar'
+                                    }}" tooltipClass="tooltip-custom">
+                      <input [maxLength]="100" [ngClass]="{ active: rowData.status }" class="toggle toggle-small"
+                        type="checkbox" role="switch" aria-checked="mixed" [ngModel]="rowData.status"
+                        (change)="emitRowAction(rowData, action)" id="action-id-{{ idx }}" />
+                      <label [ngClass]="{ inactive: !rowData.status }" for="action-id-{{ idx }}"
+                        class="form-check-label"></label>
+                    </div>
+                  </div>
+                  }
+                  @case ('block') {
+                  <a class="nav-link active" [ngClass]="{ 'active show': rowData.status }"
+                    (click)="emitRowAction(rowData, action)">
+                    <i data-container="body" placement="top" [ngbTooltip]="
+                                      rowData.isBlocked
+                                        ? 'Desbloquear'
+                                        : 'Bloquear'
+                                    " tooltipClass="tooltip-custom" class="cursor-pointer icon-md {{
+                                      rowData.isBlocked
+                                        ? 'svg-funciones-lock'
+                                        : 'svg-funciones-unlock'
+                                    }} me-2"></i>
+                  </a>
+                  }
+                  }
+                  }
+                  @if (findActions()) {
+                  <div ngbDropdown placement="bottom-left" dropdownClass="drop-actions"
+                    (openChange)="toggleDropdown($event, idx)">
+                    <a class="nav-link active">
+                      <i ngbDropdownToggle ngbTooltip="Acciones" tooltipClass="tooltip-custom"
+                        class="svg-funciones-options-vertical drop-options icon-md pe-2" id="dropdownBasic1"></i>
+                    </a>
+                    <div ngbDropdownMenu aria-labelledby="dropdownBasic1">
+                      @for (action of tableActions; track action) {
+                      @switch (action) {
+                      @case ('edit') {
+                      <div class="drop-options">
+                        <a class="cursor-pointer nav-link active" [ngClass]="{
+                                            'active show': rowData.status,
+                                          }" (click)="
+                                            emitRowAction(rowData, action)
+                                          ">
+                          <i class="svg-funciones-edit icon-md pe-2"></i>
+                          <p>Editar</p>
+                        </a>
+                      </div>
+                      }
+                      @case ('assign') {
+                      <div class="drop-options">
+                        <a style="cursor: pointer" class="nav-link active" (click)="
+                                            emitRowAction(rowData, action)
+                                          ">
+                          <i class="svg-funciones-edit-alt icon-md pe-2"></i>
+                          <p>Asignar</p>
+                        </a>
+                      </div>
+                      }
+                      @case ('records') {
+                      <div class="drop-options">
+                        <a style="cursor: pointer" class="nav-link active" (click)="
+                                            emitRowAction(rowData, action)
+                                          ">
+                          <i class="svg-objetos-document icon-md pe-2"></i>
+                          <p>Historial</p>
+                        </a>
+                      </div>
+                      }
+                      }
+                      }
+                    </div>
+                  </div>
+                  <div class="dropdown-backdrop" [class.show]="toggleActionsRow[idx]"
+                    (keyup)="toggleDropdown(false, idx)" (click)="toggleDropdown(false, idx)"></div>
+                  }
+                </ul>
+              </td>
+              }
+              @for (column of tableColumns; track column) {
+              @switch (column?.type) {
+              @case ('index') {
+              <th scope="row">{{ idx + 1 }}</th>
+              }
+              @case ('tags') {
+              <td>
+                <div class="badge-spacing">
+                  <span class="tag {{
+                                  column.config?.status ? 'approved' : 'omitted'
+                                }}">
+                    @if (rowData[column.dataKey]) {
+                    Activo
+                    } @else {
+                    Inactivo
+                    }
+                  </span>
+                </div>
+              </td>
+              }
+              @case ('tooltip') {
+              <td>
+                <span data-container="body" [placement]="(column.config?.tooltip)!.placement"
+                  [ngbTooltip]="rowData[column.dataKey]" tooltipClass="tooltip-custom" class="position-relative">
+                  {{ rowData[column.dataKey] | customDateFormat }}
+                </span>
+              </td>
+              }
+              @case ('JSON') {
+              <td style="max-width: 300px">
+                <div class="text-ellipsis" data-container="body" [placement]="(column.config?.tooltip)!.placement"
+                  [ngbTooltip]="
+                                getStringJson(rowData[column.dataKey])
+                              " tooltipClass="tooltip-custom">
+                  <code>
+                                {{ rowData[column.dataKey] | json }}
+                              </code>
+                </div>
+              </td>
+              }
+              @case ('status') {
+              <td>
+                <div class="badge-spacing">
+                  <span class="tag {{
+                                  rowData.status ? 'approved' : 'omitted'
+                                }}">
+                    <ng-container *ngIf="rowData.status; else noStatus">
+                      Activo
+                    </ng-container>
+                    <ng-template #noStatus>Inactivo</ng-template>
+                  </span>
+                </div>
+              </td>
+              }
+              @case ('actDirectory') {
+              <td>
+                {{ rowData[column.dataKey] == 'I' ? 'Si' : 'No' }}
+              </td>
+              }
+              @default {
+              <td>{{ rowData[column.dataKey] }}</td>
+              }
+              }
+              }
+            </tr>
+            }
+            @if (tableData.length === 0) {
+            <tr class="odd">
+              <td colspan="11" class="dataTables_empty" style="text-align: center">
+                ¡Ups! No se encontraron resultados.
+              </td>
+            </tr>
+            }
+            }
+          </tbody>
+        </table>
+        @if (!validAction) {
+        <!-- <mf-core-info-permission></mf-core-info-permission> -->
+        } @else {
+        @if (paginate) {
+        <div class="d-flex justify-content-between p-2">
+          <select class="form-select" style="width: auto" name="pageSize" (change)="emitLimitTableEvent($event)">
+            @for (item of limitPagination; track item) {
+            <option [value]="item.value">{{ item.label }}</option>
+            }
+          </select>
+          <ngb-pagination class="ms-3" [collectionSize]="total" [maxSize]="4" [page]="page" [pageSize]="limit"
+            (pageChange)="pageChange($event)"></ngb-pagination>
+        </div>
+        }
+        }
+      </div>
+    </div>
+  </div>
+  } @else {
+  <div>
+    <mf-core-nothing-here-page></mf-core-nothing-here-page>
+  </div>
+  }
+</div>

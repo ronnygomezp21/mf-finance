@@ -1,0 +1,15 @@
+/* Igualar altura de inputs con los shared-select */
+:host ::ng-deep .form-control,
+:host ::ng-deep .input-group .form-control {
+  min-height: 48px;
+}
+
+:host ::ng-deep .input-group-text {
+  min-height: 48px;
+}
+
+/* Labels más compactos */
+.form-label {
+  font-size: 0.82rem;
+}
+

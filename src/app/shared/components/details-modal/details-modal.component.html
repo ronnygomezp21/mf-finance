@@ -1,0 +1,33 @@
+<div class="modal-action container-fluid">
+  <div class="row">
+    <div class="col-sm-12">
+      <div class="card">
+        <div class="card-header" style="padding: 48px 48px 0px 48px">
+          <button
+            type="button"
+            class="btn-close-modal svg-funciones-close"
+            aria-label="Close"
+            (click)="close()"></button>
+          <div class="d-flex justify-content-center mb-2">
+            <label class="color-black fs-3">Detalles</label>
+          </div>
+        </div>
+
+        <div class="card-body" style="padding: 24px 48px 48px 48px">
+          <div class="details-body">
+            <div class="row">
+              @for (item of dataModalDetails; track item) {
+                @if (item.value) {
+                  <div class="col-12 col-md-6 mb-3">
+                    <label class="font-secondary">{{ item.label }}</label>
+                    <p>{{ item.value }}</p>
+                  </div>
+                }
+              }
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

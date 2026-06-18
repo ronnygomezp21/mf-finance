@@ -1,0 +1,36 @@
+<div
+  class="d-flex flex-wrap {{ justifyContentObject[alignContent()] }} {{
+    customClass()
+  }}"
+  style="row-gap: 15px; column-gap: 20px">
+  @for (chip of chipsOptions().controls; track chip) {
+    @if ((chipsHide() && !chip.value?.[chipsHide()]) || !chipsHide()) {
+      <ng-container *ngTemplateOutlet="ChipElement"></ng-container>
+    }
+    <ng-template #ChipElement>
+      <button
+        class="d-flex"
+        [ngClass]="{
+          'filter-chips': !useAlternativeStyles(),
+          'filter-chips-alternative': useAlternativeStyles(),
+          'selected-chip': chip.value?.selected,
+        }"
+        (click)="onSelected(chip)">
+        @if (chip.value?.selected) {
+          <i [class]="iconCheckedChips()"></i>
+        }
+        <input
+          type="checkbox"
+          [id]="'chip-' + chip.value[bindLabel()]"
+          [checked]="chip.value?.selected"
+          style="display: none"
+          tabindex="-1"
+          aria-hidden="true"
+          readonly />
+        <label class="pe-none" [for]="'chip-' + chip.value[bindLabel()]">
+          {{ chip.value[bindLabel()] }}
+        </label>
+      </button>
+    </ng-template>
+  }
+</div>

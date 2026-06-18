@@ -1,0 +1,61 @@
+// Shared form styles — importado por cada form component
+.section-title {
+  color: #2c3e50;
+  font-weight: 600;
+  border-bottom: 2px solid #3498db;
+  padding-bottom: 0.5rem;
+  display: inline-block;
+
+  i { color: #3498db; }
+}
+
+.card {
+  border: 1px solid #e0e6ed;
+  border-radius: 8px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+}
+
+.inner-card {
+  background-color: #f8f9fa;
+  border: 1px solid #e9ecef;
+  border-radius: 6px;
+  padding: 1rem 1.25rem;
+}
+
+.inner-card-title {
+  font-weight: 600;
+  color: #495057;
+  margin-bottom: 0.75rem;
+  font-size: 0.95rem;
+}
+
+.form-label {
+  font-weight: 500;
+  font-size: 0.85rem;
+  color: #495057;
+  margin-bottom: 0.25rem;
+}
+
+.form-control {
+  border-radius: 4px;
+  font-size: 0.9rem;
+
+  &:focus {
+    border-color: #3498db;
+    box-shadow: 0 0 0 0.15rem rgba(52, 152, 219, 0.15);
+  }
+}
+
+.btn-primary {
+  background-color: #3498db;
+  border-color: #3498db;
+  &:hover { background-color: #2980b9; border-color: #2980b9; }
+}
+
+.btn-success {
+  background-color: #27ae60;
+  border-color: #27ae60;
+  &:hover { background-color: #219a52; border-color: #219a52; }
+}
+
+small.text-danger { font-size: 0.78rem; }

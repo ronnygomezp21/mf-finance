@@ -1,0 +1,65 @@
+<article class="w-100">
+  <div
+    style="width: 100%; max-width: 100%"
+    class="form-floating relative textArea-styles m-0"
+    [ngClass]="{
+      invalid:
+        control()?.touched &&
+        (control()?.errors?.['required'] ||
+          control()?.errors?.['minlength'] ||
+          control()?.errors?.['maxlength'] ||
+          control()?.errors?.['noWhitespace']),
+    }"
+    #textareaContainer>
+    @if (control(); as control) {
+      <textarea
+        class="form-control scrollbar-primary"
+        [formControl]="control"
+        [maxLength]="maxLength()"
+        [placeholder]="label()"
+        [rows]="rows()"
+        style="height: 100%; width: 100%; min-height: auto"
+        [id]="label()"></textarea>
+    } @else {
+      <textarea
+        class="form-control scrollbar-primary"
+        [value]="value()"
+        [maxLength]="maxLength()"
+        [placeholder]="label()"
+        [rows]="rows()"
+        style="height: 100%; width: 100%; min-height: auto"
+        [id]="label()"
+        [disabled]="disabled()"></textarea>
+    }
+    <label [for]="label()">
+      <p>{{ label() }}</p>
+    </label>
+    @if (resize() !== 'none') {
+      <span
+        class="resize"
+        (mousedown)="onResizeStart($event)"
+        (touchstart)="onResizeStart($event)"
+        title="Arrastrar para redimensionar"></span>
+    }
+  </div>
+  @if (control()?.touched && control()?.invalid) {
+    <div class="invalid">
+      @if (control()?.errors?.['required']) {
+        <span>Este campo es requerido</span>
+      }
+      @if (control()?.errors?.['minlength']) {
+        <span>
+          Mínimo {{ control()?.errors?.['minlength']?.min }} caracteres
+        </span>
+      }
+      @if (control()?.errors?.['maxlength']) {
+        <span>
+          Máximo {{ control()?.errors?.['maxlength']?.min }} caracteres
+        </span>
+      }
+      @if (control()?.errors?.['noWhitespace']) {
+        <span>No debe empezar o acabar con espacios vacíos.</span>
+      }
+    </div>
+  }
+</article>

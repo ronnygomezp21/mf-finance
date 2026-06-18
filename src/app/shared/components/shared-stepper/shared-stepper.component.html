@@ -1,0 +1,48 @@
+<div class="stepper-container">
+  <!-- Pestañas Superiores -->
+  <div class="stepper-header d-flex overflow-auto mb-4">
+    @for (step of steps; track step.id; let i = $index) {
+      <div 
+        class="stepper-tab" 
+        [class.active]="i === currentStepIndex"
+        [class.completed]="i < currentStepIndex"
+        (click)="goToStep(i)">
+        {{ step.label }}
+      </div>
+    }
+  </div>
+
+  <!-- Contenido Dinámico del Formulario Actual -->
+  <div class="stepper-content p-4">
+    <!-- Encabezado Dinámico parametrizado -->
+    <div class="d-flex align-items-center mb-4 step-dynamic-header">
+      <div class="step-circle me-3 d-flex align-items-center justify-content-center text-white rounded-circle fw-bold">
+        {{ currentStepIndex + 1 }}
+      </div>
+      <div>
+        <div class="mb-1 fw-bold step-title">{{ steps[currentStepIndex].label }}</div>
+        <p class="mb-0 text-muted step-description">{{ steps[currentStepIndex].description }}</p>
+      </div>
+    </div>
+
+    @if (currentStep) {
+      <ng-container *ngComponentOutlet="currentStep.component"></ng-container>
+    }
+  </div>
+
+  <!-- Acciones (Botones de navegación, AFUERA del recuadro) -->
+  <div class="stepper-footer d-flex justify-content-end mt-4">
+    @if (currentStepIndex > 0) {
+      <button class="btn btn-outline-secondary me-3" (click)="onBack()">
+        Regresar
+      </button>
+    }
+    
+    <button 
+      class="btn btn-primary px-4 py-2" 
+      [disabled]="!stepperService.isCurrentStepValid()"
+      (click)="onContinue()">
+      {{ nextStepLabel }}
+    </button>
+  </div>
+</div>

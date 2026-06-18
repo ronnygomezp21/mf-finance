@@ -1,0 +1,155 @@
+<div class="offcanvas-header background-color">
+  <h6 class="offcanvas-title fw-bolder font-gray-dark-1 flex-grow-1">
+    Filtrar por:
+  </h6>
+  <button
+    type="button"
+    class="btn-close filter-close-icon"
+    aria-label="Close"
+    (click)="close()"></button>
+</div>
+<div class="m-0 scrollbar-primary max-74-vh">
+  <div class="filters filter-container">
+    <div class="d-flex justify-content-start">
+      <div class="mt-3">
+        <label>
+          <p class="font-gray">Estado</p>
+        </label>
+      </div>
+    </div>
+
+    <div class="d-flex justify-content-start gap-10">
+      <button
+        class="filter-chips d-flex"
+        [ngClass]="{ 'selected-chip': filterValue == null }"
+        (click)="setStatusValue('null')">
+        @if (filterValue == null) {
+          <i class="svg-funciones-check"></i>
+        }
+        <label for="">Todos</label>
+      </button>
+      <button
+        class="filter-chips d-flex"
+        [ngClass]="{ 'selected-chip': filterValue == true }"
+        (click)="setStatusValue(true)">
+        @if (filterValue == true) {
+          <i class="svg-funciones-check"></i>
+        }
+        <label for="">Activos</label>
+      </button>
+      <button
+        class="filter-chips d-flex"
+        [ngClass]="{ 'selected-chip': filterValue == false }"
+        (click)="setStatusValue(false)">
+        @if (filterValue == false) {
+          <i class="svg-funciones-check"></i>
+        }
+        <label for="">Inactivos</label>
+      </button>
+    </div>
+
+    @if (userFilter) {
+      <div class="d-flex justify-content-start mt-4">
+        <div class="mt-3">
+          <span>
+            <p class="font-gray">Entidad</p>
+          </span>
+        </div>
+      </div>
+
+      <div class="row d-flex justify-content-center">
+        <div class="form-group simple-select-2 form-floating input-styles">
+          <span
+            class="select2 select2-container select2-container--default select2-container--below">
+            <ng-select
+              (change)="pushChips($event)"
+              [deselectOnClick]="true"
+              [items]="entityDataCombo"
+              [clearSearchOnAdd]="true"
+              [searchable]="true"
+              bindLabel="label"
+              bindValue="value"
+              [multiple]="false"
+              notFoundText="No se encontraron resultados."></ng-select>
+          </span>
+        </div>
+      </div>
+
+      <div class="row mt-3">
+        <div class="badge-spacing">
+          @if (entityDataCombo) {
+            @for (chip of entityValue; track chip) {
+              <button
+                class="filter-chips d-flex selected-chip"
+                (click)="deleteChip(chip)">
+                <i class="svg-funciones-check"></i>
+                <label for="">{{ getLabelEntity(chip) }}</label>
+              </button>
+              <!-- <span class="tag sent text-nowrap">
+          <i (click)="deleteChip(chip)" class="svg-informativo-circle-error font-white cursor-pointer fs-6"></i>
+          <span>{{ getLabelEntity(chip) }}</span>
+        </span> -->
+            }
+          }
+        </div>
+      </div>
+    }
+    @if (!userFilter) {
+      <div class="d-flex justify-content-start mt-4">
+        <div class="mt-3">
+          <span>
+            <p class="font-gray">Tipo de usuario</p>
+          </span>
+        </div>
+      </div>
+
+      <div class="row d-flex justify-content-center">
+        <div class="form-group simple-select-2 form-floating input-styles">
+          <span
+            class="select2 select2-container select2-container--default select2-container--below">
+            <ng-select
+              (change)="pushChipsType($event)"
+              [deselectOnClick]="true"
+              [items]="typeDataCombo"
+              [clearSearchOnAdd]="true"
+              [searchable]="true"
+              bindLabel="label"
+              bindValue="value"
+              [multiple]="false"
+              notFoundText="No se encontraron resultados."></ng-select>
+          </span>
+        </div>
+      </div>
+
+      <div class="row mt-3">
+        <div class="badge-spacing">
+          @if (typeDataCombo) {
+            @for (chip of typeValue; track chip) {
+              <button
+                class="filter-chips d-flex selected-chip"
+                (click)="deleteChipType(chip)">
+                <i class="svg-funciones-check"></i>
+                <label for="">{{ getLabelType(chip) }}</label>
+              </button>
+              <!-- <span class="tag sent text-nowrap">
+          <i (click)="deleteChip(chip)" class="svg-informativo-circle-error font-white cursor-pointer fs-6"></i>
+          <span>{{ getLabelEntity(chip) }}</span>
+        </span> -->
+            }
+          }
+        </div>
+      </div>
+    }
+  </div>
+</div>
+
+<div class="action-container fixed-bottom">
+  <div class="d-flex justify-content-between action-btn">
+    <button class="btn btn-secondary" (click)="close()">Restaurar</button>
+
+    <button class="btn btn-primary" (click)="emitFilterEvent()">
+      <i class="svg-funciones-check font-white"></i>
+      Aplicar
+    </button>
+  </div>
+</div>
