@@ -41,7 +41,7 @@
           class="btn btn-primary w-100"
           [disabled]="!selectedRetentionType || !selectedRetentionCode"
           (click)="addRetention()">
-          <i class="bi bi-plus-lg me-1"></i>Agregar
+          <span>Agregar</span>
         </button>
       </div>
     </div>
@@ -74,7 +74,7 @@
               <td>{{ ret.effectiveDate }}</td>
               <td><span class="badge bg-success">{{ ret.status }}</span></td>
               <td class="text-center">
-                <button class="btn btn-outline-danger btn-sm" (click)="removeRetention($index)" title="Eliminar">
+                <button class="btn btn-danger btn-sm" (click)="removeRetention($index)" title="Eliminar">
                   <i class="bi bi-x-lg"></i>
                 </button>
               </td>
