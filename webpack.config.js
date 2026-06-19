@@ -26,7 +26,7 @@ const moduleFederationConfig = withModuleFederationPlugin({
 });
 
 // moduleFederationConfig.output.publicPath = "https://nc.aseguradoradelsur.com/security/";
-moduleFederationConfig.output.publicPath = "http://localhost:4201/";
+moduleFederationConfig.output.publicPath = "http://localhost:4202/";
 
 module.exports = moduleFederationConfig;
 
