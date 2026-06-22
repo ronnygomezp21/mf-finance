@@ -47,13 +47,12 @@
     </mf-finance-supplier-quota-form>
   }
 
-  <!-- Tab 6 — Retenciones -->
-  @if (activeTab === 5) {
-    <mf-finance-supplier-retentions-form
-      [isSubmitting]="isSubmitting"
-      (submit)="onSubmit($event)">
-    </mf-finance-supplier-retentions-form>
-  }
+  <!-- Tab 6 — Retenciones — [BUG-014-B FIX] [hidden] en vez de @if para preservar addedRetentions[] al cambiar de tab -->
+  <mf-finance-supplier-retentions-form
+    [hidden]="activeTab !== 5"
+    [isSubmitting]="isSubmitting"
+    (submit)="onSubmit($event)">
+  </mf-finance-supplier-retentions-form>
 
   <!-- Botones de navegación (fuera de los forms) -->
   <div class="d-flex justify-content-end gap-2 mt-4 pt-3 border-top">

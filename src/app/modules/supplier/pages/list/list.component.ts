@@ -50,7 +50,11 @@ export class ListComponent implements OnInit {
     this.router.navigateByUrl("/supplier/record");
   }
 
-  iconAction(event: any) { }
+  iconAction(event: any) {
+    if (event?.actionName === 'edit' && event?.data?.id) {
+      this.router.navigate(['/supplier/edit'], { state: { supplierId: event.data.id } });
+    }
+  }
 
   onLimitTermChange(limitValue: number) {
     this.limit = limitValue;

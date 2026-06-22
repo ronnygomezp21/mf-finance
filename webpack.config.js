@@ -9,6 +9,8 @@ const moduleFederationConfig = withModuleFederationPlugin({
   filename: 'remoteEntry.js',
   exposes: {
     './SupplierModule': './src/app/modules/supplier/supplier.module.ts',
+    './SupplierAuditModule': './src/app/modules/supplier-audit/supplier-audit.module.ts',
+    './ResetQuotaModule': './src/app/modules/reset-quota/reset-quota.module.ts',
   },
 
   shared: {

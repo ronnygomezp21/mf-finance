@@ -1,0 +1,7 @@
+<div class="mt-3 px-3">
+  <mf-core-shared-table [total]="total" [page]="page" [limit]="limit" [button]="false" [optionsFilter]="false"
+    [tableColumns]="tableColumns" [tableData]="auditRecords" [tableActions]="['edit']"
+    (limitAction)="onLimitTermChange($event)" (pageNumberAction)="get($event)"
+    (searchTermEvent)="onSearchTermChange($event)">
+  </mf-core-shared-table>
+</div>

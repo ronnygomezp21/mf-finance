@@ -305,10 +305,10 @@ ${this.buildInterfaceProperties()}
 const environmentSchema = {
   apiUrl: env.schema('API_URL').required().asUrlString(),
   entityRoot: env.schema('ENTITY_ROOT').required().asString(),
-  fileUser: env.schema('FILE_AUTH_USERNAME').required().asString(),
-  filePassword: env.schema('FILE_AUTH_PASSWORD').required().asString(),
+  // fileUser: env.schema('FILE_AUTH_USERNAME').required().asString(),
+  // filePassword: env.schema('FILE_AUTH_PASSWORD').required().asString(),
   secretKey: env.schema('SECRET_KEY').required().asString(),
-  mainEntityCode: env.schema('MAIN_ENTITY_CODE').required().asString(),
+  // mainEntityCode: env.schema('MAIN_ENTITY_CODE').required().asString(),
 };
 
 // Ejecutar

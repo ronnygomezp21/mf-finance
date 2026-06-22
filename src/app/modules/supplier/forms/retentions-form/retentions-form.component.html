@@ -1,56 +1,69 @@
-<div class="card p-4">
-  <h5 class="section-title mb-3">
-    <i class="bi bi-receipt me-2"></i>Retenciones
-  </h5>
+<!-- [AI-UPDATED | skill: mf-debt-skill | spec: tasks/mf-finance/debt-013-mf-retenciones-estandarizacion-visual.md
+      | ticket: #013 | model: claude-opus-4-6] -->
 
-  <!-- Selector de retención -->
-  <div class="inner-card mb-4">
-    <h6 class="inner-card-title">Retenciones a aplicar</h6>
-    <div class="row g-3 align-items-end">
-      <div class="col-md-3">
-        <label class="form-label">Tipo de retención</label>
-        <ng-select
-          [(ngModel)]="selectedRetentionType"
-          [items]="retentionCatalog"
-          bindLabel="type"
-          bindValue="type"
-          placeholder="Seleccione tipo"
-          (change)="onRetentionTypeChange()">
-        </ng-select>
-      </div>
-      <div class="col-md-3">
-        <label class="form-label">Ente regulador</label>
-        <input class="form-control" [value]="selectedRetentionEntity || '—'" disabled />
-      </div>
-      <div class="col-md-4">
-        <label class="form-label">Código</label>
-        <ng-select
-          [(ngModel)]="selectedRetentionCode"
-          [items]="availableCodes"
-          bindLabel="description"
-          bindValue="code"
-          [placeholder]="selectedRetentionType ? 'Seleccione código' : 'Elige el tipo primero'"
-          [disabled]="!selectedRetentionType">
-          <ng-template ng-option-tmp let-item="item">
-            {{ item.code }} — {{ item.description }} ({{ item.percentage }}%)
-          </ng-template>
-        </ng-select>
-      </div>
-      <div class="col-md-2">
-        <button
-          class="btn btn-primary w-100"
-          [disabled]="!selectedRetentionType || !selectedRetentionCode"
-          (click)="addRetention()">
-          <i class="bi bi-plus-lg me-1"></i>Agregar
-        </button>
-      </div>
+<div class="card p-4">
+  <!-- AC-01: Header con número y título (mismo estándar que los otros tabs) -->
+  <div class="d-flex align-items-start mb-4">
+    <span class="badge rounded-circle bg-dark d-flex align-items-center justify-content-center me-3"
+          style="width: 26px; height: 26px; min-width: 26px; font-size: 0.75rem; padding: 0;">6</span>
+    <div>
+      <h5 class="mb-0 fw-bold">Retenciones a aplicar</h5>
+      <small class="text-muted">Retenciones vigentes asociadas al proveedor según su tipo y servicio. Solo se muestran códigos activos.</small>
     </div>
   </div>
 
-  <!-- Tabla de retenciones -->
+  <!-- Selector de retención — AC-02 a AC-07 -->
+  <div class="row g-3 align-items-end mb-4">
+    <!-- AC-02: Tipo de retención con mf-core-shared-select -->
+    <div class="col-md-3">
+      <label class="form-label">Tipo de retención</label>
+      <mf-core-shared-select
+        label="Seleccionar..."
+        [listOptions]="retentionCatalog"
+        [control]="$any(retentionTypeControl)"
+        bindLabel="type"
+        bindValue="type"
+        (getValue)="onRetentionTypeSelected($event)">
+      </mf-core-shared-select>
+    </div>
+
+    <!-- AC-03: Ente regulador readonly con icono candado -->
+    <div class="col-md-3">
+      <label class="form-label">Ente regulador</label>
+      <div class="input-group">
+        <span class="input-group-text"><i class="bi bi-lock"></i></span>
+        <input class="form-control" [value]="selectedRetentionEntity || '—'" disabled />
+      </div>
+    </div>
+
+    <!-- AC-04: Código con mf-core-shared-select -->
+    <div class="col-md-4">
+      <label class="form-label">Código</label>
+      <mf-core-shared-select
+        [label]="selectedRetentionType ? 'Seleccione código' : 'Elige el tipo primero'"
+        [listOptions]="availableCodes"
+        [control]="$any(retentionCodeControl)"
+        bindLabel="description"
+        bindValue="code"
+        (getValue)="onRetentionCodeSelected($event)">
+      </mf-core-shared-select>
+    </div>
+
+    <!-- AC-05: Botón Agregar -->
+    <div class="col-md-2">
+      <button
+        class="btn btn-outline-primary w-100"
+        [disabled]="!selectedRetentionType || !selectedRetentionCode"
+        (click)="addRetention()">
+        <i class="bi bi-plus-lg me-1"></i>Agregar
+      </button>
+    </div>
+  </div>
+
+  <!-- Tabla de retenciones — AC-08 a AC-14 -->
   @if (addedRetentions.length) {
     <div class="table-responsive mb-4">
-      <table class="table table-bordered table-hover align-middle">
+      <table class="table table-hover align-middle">
         <thead class="table-light">
           <tr>
             <th>Ente</th>
@@ -60,22 +73,23 @@
             <th>%</th>
             <th>Vigencia</th>
             <th>Estado</th>
-            <th class="text-center" style="width: 50px;"></th>
+            <th class="text-center" style="width: 60px;">Acción</th>
           </tr>
         </thead>
         <tbody>
           @for (ret of addedRetentions; track $index) {
             <tr>
-              <td>{{ ret.entity }}</td>
+              <td><span class="badge bg-secondary">{{ ret.entity }}</span></td>
               <td>{{ ret.type }}</td>
-              <td><span class="badge bg-secondary">{{ ret.code }}</span></td>
+              <td><strong>{{ ret.code }}</strong></td>
               <td>{{ ret.description }}</td>
-              <td>{{ ret.percentage }}%</td>
+              <td class="fw-bold text-primary">{{ ret.percentage }}%</td>
               <td>{{ ret.effectiveDate }}</td>
-              <td><span class="badge bg-success">{{ ret.status }}</span></td>
+              <td><span class="badge bg-success-subtle text-success">{{ ret.status }}</span></td>
               <td class="text-center">
-                <button class="btn btn-outline-danger btn-sm" (click)="removeRetention($index)" title="Eliminar">
-                  <i class="bi bi-x-lg"></i>
+                <button class="btn btn-sm btn-link text-danger p-0" (click)="removeRetention($index)" title="Eliminar retención"
+                        style="font-size: 1.1rem; line-height: 1; text-decoration: none;">
+                  ✕
                 </button>
               </td>
             </tr>
@@ -84,26 +98,9 @@
       </table>
     </div>
   } @else {
+    <!-- AC-15: Estado vacío -->
     <div class="text-center text-muted py-4 mb-4">
-      <i class="bi bi-inbox fs-1 d-block mb-2"></i>
       Sin retenciones asignadas — Agrega las retenciones vigentes que apliquen a este proveedor
     </div>
   }
-
-  <!-- Datos de auditoría -->
-  <div class="inner-card mb-4">
-    <h6 class="inner-card-title">
-      <i class="bi bi-clock-history me-1"></i>Datos de Auditoría
-    </h6>
-    <div class="row g-3">
-      <div class="col-md-6">
-        <label class="form-label text-muted">Fecha de ingreso</label>
-        <input class="form-control" [value]="'Automático al crear — ' + ('' | date:'dd/MM/yyyy')" disabled />
-      </div>
-      <div class="col-md-6">
-        <label class="form-label text-muted">Usuario que crea</label>
-        <input class="form-control" value="Sesión actual" disabled />
-      </div>
-    </div>
-  </div>
 </div>

@@ -93,7 +93,7 @@ export class FiscalFormComponent implements OnInit {
         phoneCtrl?.setValue('');
         this.phonePlaceholder = 'Selecciona el tipo';
       }
-      
+
       phoneCtrl?.updateValueAndValidity();
     });
 
@@ -118,7 +118,8 @@ export class FiscalFormComponent implements OnInit {
   private updateForeignValidators(isForeign: boolean): void {
     const f = this.form();
     const foreignFields = ['residentPaymentType', 'fiscalRegimeType', 'applyDoubleTaxation', 'applyLegalRegulations'];
-    const nationalOnlyRequired = [f.get('taxpayerCategory'), f.get('largeTaxpayer')];
+    // const nationalOnlyRequired = [f.get('taxpayerCategory'), f.get('largeTaxpayer')];
+    const nationalOnlyRequired = [f.get('province'), f.get('taxpayerCategory'), f.get('largeTaxpayer')];
     const nationalOnlyOptional = [f.get('nonProfit'), f.get('qualifiedArtisan')];
 
     if (isForeign) {

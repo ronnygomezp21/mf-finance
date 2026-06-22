@@ -1,0 +1,19 @@
+// [AI-GENERATED | skill: mf-feature-skill | spec: tasks/mf-finance/feat-012-mf-edicion-proveedor.md
+//  | ticket: #012 | model: claude-opus-4-6]
+
+.record-container {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 1.5rem;
+}
+
+.badge {
+  font-weight: 500;
+  font-size: 0.8rem;
+}
+
+@media (max-width: 768px) {
+  .record-container {
+    padding: 0.75rem;
+  }
+}

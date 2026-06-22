@@ -1,4 +1,4 @@
-import { Component, inject, input, OnInit } from '@angular/core';
+import { Component, effect, inject, input, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import {
   PAYMENT_METHODS, ACCOUNT_TYPES, BANK_NAMES, CURRENCIES, COUNTRIES,
@@ -23,6 +23,15 @@ export class BankingFormComponent implements OnInit {
   supplierIdentification = input<string>('');
   /** Tipo de identificación del proveedor (default para paymentIdType) */
   supplierIdentificationType = input<number | null>(null);
+
+  // [BUGFIX #019 | skill: ms-bugfix-skill] — Reaccionar a cambios de residencia
+  constructor() {
+    effect(() => {
+      const isForeign = this.isForeignResidency();
+      const paymentVal = this.form().get('paymentMethod')?.value;
+      this.updateBankValidators(paymentVal === this.transferenciaId);
+    });
+  }
 
   get holderMismatch(): boolean {
     const holder = (this.form().get('accountHolder')?.value || '').trim().toLowerCase();
@@ -106,25 +115,64 @@ export class BankingFormComponent implements OnInit {
   }
 
   /** Actualiza validadores de campos bancarios según método de pago y residencia */
+  // [BUGFIX #019 | skill: ms-bugfix-skill] — Ocultar campos bancarios para extranjeros
   private updateBankValidators(isTransfer: boolean): void {
     const f = this.form();
     const isForeign = this.isForeignResidency();
-    const commonFields = ['accountType', 'accountNumber', 'accountHolder'];
 
-    if (isTransfer) {
-      commonFields.forEach(field => f.get(field)?.setValidators(Validators.required));
-      // Banco local vs extranjero
-      if (isForeign) {
-        f.get('bankName')?.clearValidators();
-        f.get('bankNameForeign')?.setValidators(Validators.required);
-      } else {
+    // Campos que SOLO aplican a proveedores nacionales con Transferencia
+    const nationalBankFields = [
+      'bankCountry', 'currency', 'bankIdClassifier',
+      'bankName', 'bankNameForeign',
+      'accountType', 'accountHolder',
+      'paymentIdType', 'paymentId',
+    ];
+
+    if (isForeign) {
+      // Extranjero: limpiar validadores y valores de campos nacionales
+      nationalBankFields.forEach(field => {
+        f.get(field)?.clearValidators();
+        f.get(field)?.setValue(null, { emitEvent: false });
+        f.get(field)?.updateValueAndValidity();
+      });
+    } else {
+      // Nacional: activar/desactivar según Transferencia
+      const transferFields = ['bankCountry', 'currency', 'bankIdClassifier',
+        'accountType', 'accountHolder'];
+
+      if (isTransfer) {
+        transferFields.forEach(field => f.get(field)?.setValidators(Validators.required));
         f.get('bankName')?.setValidators(Validators.required);
         f.get('bankNameForeign')?.clearValidators();
+
+        // Asignar defaults si están vacíos: Ecuador, USD, 022
+        if (!f.get('bankCountry')?.value) {
+          f.get('bankCountry')?.setValue(this.defaultCountryId, { emitEvent: false });
+        }
+        if (!f.get('currency')?.value) {
+          f.get('currency')?.setValue(this.defaultCurrencyId, { emitEvent: false });
+        }
+        if (!f.get('bankIdClassifier')?.value) {
+          f.get('bankIdClassifier')?.setValue('022', { emitEvent: false });
+        }
+      } else {
+        [...transferFields, 'bankName', 'bankNameForeign'].forEach(field =>
+          f.get(field)?.clearValidators()
+        );
       }
-    } else {
-      [...commonFields, 'bankName', 'bankNameForeign'].forEach(field => f.get(field)?.clearValidators());
+
+      [...transferFields, 'bankName', 'bankNameForeign'].forEach(field =>
+        f.get(field)?.updateValueAndValidity()
+      );
     }
-    [...commonFields, 'bankName', 'bankNameForeign'].forEach(field => f.get(field)?.updateValueAndValidity());
+
+    // accountNumber — requerido en Transferencia sin importar residencia
+    if (isTransfer) {
+      f.get('accountNumber')?.setValidators(Validators.required);
+    } else {
+      f.get('accountNumber')?.clearValidators();
+    }
+    f.get('accountNumber')?.updateValueAndValidity();
   }
 
   /** Actualiza validadores de pago a tercero */

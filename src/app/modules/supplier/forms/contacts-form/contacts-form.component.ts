@@ -17,13 +17,16 @@ export class ContactsFormComponent {
   readonly contactTypes = CONTACT_TYPES;
   readonly phoneTypes = PHONE_TYPES;
 
+  /** ID del tipo de contacto por defecto: Retención */
+  readonly defaultContactTypeId = 2;
+
   get contactsArray(): FormArray {
     return this.form().get('contacts') as FormArray;
   }
 
   addContact(): void {
     this.contactsArray.push(this.fb.group({
-      contactType: [null, Validators.required],
+      contactType: [this.defaultContactTypeId, Validators.required],
       name: ['', Validators.required],
       position: [''],
       phoneType: [null],

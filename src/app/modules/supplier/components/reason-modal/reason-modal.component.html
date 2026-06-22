@@ -1,0 +1,70 @@
+<!-- [AI-GENERATED | skill: mf-feature-skill | spec: tasks/mf-finance/feat-012-mf-edicion-proveedor.md
+      | ticket: #012 | model: claude-opus-4-6] -->
+
+@if (isOpen()) {
+  <!-- Backdrop -->
+  <div class="modal-backdrop fade show"></div>
+
+  <!-- Modal -->
+  <div class="modal d-block" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+      <div class="modal-content">
+        <!-- Header -->
+        <div class="modal-header">
+          <h5 class="modal-title fw-bold">Motivo del cambio</h5>
+          <button type="button" class="btn-close" (click)="onCancel()"></button>
+        </div>
+
+        <!-- Body -->
+        <div class="modal-body">
+          <p class="text-muted mb-3">
+            Por favor, indique el motivo de la modificación del proveedor.
+            Este registro quedará almacenado en la auditoría.
+          </p>
+
+          <div class="mb-3">
+            <label for="reasonTextarea" class="form-label fw-semibold">
+              Motivo <span class="text-danger">*</span>
+            </label>
+            <textarea
+              id="reasonTextarea"
+              class="form-control"
+              rows="4"
+              [formControl]="reasonControl"
+              [class.is-invalid]="reasonControl.touched && reasonControl.invalid"
+              maxlength="500"
+              placeholder="Describa el motivo de la modificación...">
+            </textarea>
+
+            <!-- Character counter -->
+            <div class="d-flex justify-content-between mt-1">
+              @if (reasonControl.touched && reasonControl.hasError('required')) {
+                <small class="text-danger">El motivo es obligatorio.</small>
+              } @else {
+                <small>&nbsp;</small>
+              }
+              <small class="text-muted">{{ charCount }}/500</small>
+            </div>
+          </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="modal-footer">
+          <button
+            type="button"
+            class="btn btn-outline-secondary"
+            (click)="onCancel()">
+            Cancelar
+          </button>
+          <button
+            type="button"
+            class="btn btn-primary"
+            [disabled]="reasonControl.invalid"
+            (click)="onConfirm()">
+            Confirmar
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+}

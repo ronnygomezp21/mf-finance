@@ -8,9 +8,11 @@ import { SharedModule } from 'src/app/shared/shared.module';
 // Pages
 import { ListComponent } from './pages/list/list.component';
 import { RecordComponent } from './pages/record/record.component';
+import { EditComponent } from './pages/edit/edit.component';
 
 // Components
 import { SupplierTabsComponent } from './components/supplier-tabs/supplier-tabs.component';
+import { ReasonModalComponent } from './components/reason-modal/reason-modal.component';
 
 // Forms
 import { GeneralFormComponent } from './forms/general-form/general-form.component';
@@ -26,8 +28,10 @@ import { RetentionsFormComponent } from './forms/retentions-form/retentions-form
     // Pages
     ListComponent,
     RecordComponent,
+    EditComponent,
     // Components
     SupplierTabsComponent,
+    ReasonModalComponent,
     // Forms
     GeneralFormComponent,
     FiscalFormComponent,
@@ -45,3 +49,4 @@ import { RetentionsFormComponent } from './forms/retentions-form/retentions-form
   ]
 })
 export class SupplierModule { }
+

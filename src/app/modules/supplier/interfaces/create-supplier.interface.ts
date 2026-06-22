@@ -2,6 +2,7 @@
 //  | ticket: #001 | model: claude-sonnet-4-6]
 
 import { CatalogValueI } from '../services/supplier.service';
+import { SessionUserInterface } from 'src/app/shared/interfaces/user-session.interfaces';
 
 /** DTO que se envía al backend para crear un proveedor */
 export interface CreateSupplierPayloadI {
@@ -11,6 +12,9 @@ export interface CreateSupplierPayloadI {
   contributorType: CatalogValueI;
   identificationType: CatalogValueI;
   identification: string;
+  // [FEAT #023] — Identificación secundaria (opcional)
+  secondaryIdentificationType?: CatalogValueI | null;
+  secondaryIdentification?: string | null;
   frequency: CatalogValueI;
   residency: CatalogValueI;
   classification: CatalogValueI;
@@ -63,6 +67,9 @@ export interface CreateSupplierPayloadI {
   thirdPartyAccount?: CreateThirdPartyI;
   externalPayment?: CreateExternalPaymentI;
   retentions?: CreateRetentionI[];
+
+  // [FEAT #018] Sesión del usuario logueado — obligatorio en toda mutación
+  sessionUser: SessionUserInterface;
 }
 
 export interface CreateContactI {

@@ -2,7 +2,7 @@
   <!-- Header con número y título -->
   <div class="d-flex align-items-start mb-4">
     <span class="badge rounded-circle bg-dark d-flex align-items-center justify-content-center me-3"
-          style="width: 26px; height: 26px; min-width: 26px; font-size: 0.75rem; padding: 0;">2</span>
+      style="width: 26px; height: 26px; min-width: 26px; font-size: 0.75rem; padding: 0;">2</span>
     <div>
       <h5 class="mb-0 fw-bold">Datos Fiscales</h5>
       <small class="text-muted">Ubicación, contacto fiscal, actividad y clasificación tributaria del proveedor.</small>
@@ -13,35 +13,26 @@
     <!-- País -->
     <div class="col-md-6">
       <label class="form-label fw-semibold">País <span class="text-danger">*</span></label>
-      <mf-core-shared-select
-        label="Seleccionar..."
-        [listOptions]="countries"
-        [control]="$any(form().get('country'))"
-        bindLabel="name"
-        bindValue="id">
+      <mf-core-shared-select label="Seleccionar..." [listOptions]="countries" [control]="$any(form().get('country'))"
+        bindLabel="name" bindValue="id">
       </mf-core-shared-select>
     </div>
 
-    <!-- Provincia -->
+    <!-- Provincia (solo nacional) -->
+    @if (!isForeignResidency()) {
     <div class="col-md-6">
       <label class="form-label fw-semibold">Provincia <span class="text-danger">*</span></label>
-      <mf-core-shared-select
-        label="Seleccionar..."
-        [listOptions]="provinces"
-        [control]="$any(form().get('province'))"
-        bindLabel="name"
-        bindValue="id">
+      <mf-core-shared-select label="Seleccionar..." [listOptions]="provinces" [control]="$any(form().get('province'))"
+        bindLabel="name" bindValue="id">
       </mf-core-shared-select>
     </div>
+    }
 
     <!-- Ciudad -->
     <div class="col-md-6">
       <label class="form-label fw-semibold">Ciudad <span class="text-danger">*</span></label>
-      <input
-        class="form-control"
-        [class.is-invalid]="form().get('city')?.touched && form().get('city')?.invalid"
-        formControlName="city"
-        placeholder="Ciudad" />
+      <input class="form-control" [class.is-invalid]="form().get('city')?.touched && form().get('city')?.invalid"
+        formControlName="city" placeholder="Ciudad" />
       <small class="text-danger" *ngIf="form().get('city')?.touched && form().get('city')?.hasError('required')">
         Campo obligatorio
       </small>
@@ -53,13 +44,11 @@
         <label class="form-label fw-semibold">Dirección fiscal <span class="text-danger">*</span></label>
         <small class="text-muted">{{ form().get('fiscalAddress')?.value?.length || 0 }} / 500</small>
       </div>
-      <input
-        class="form-control"
+      <input class="form-control"
         [class.is-invalid]="form().get('fiscalAddress')?.touched && form().get('fiscalAddress')?.invalid"
-        formControlName="fiscalAddress"
-        maxlength="500"
-        placeholder="Calle principal, número y referencia" />
-      <small class="text-danger" *ngIf="form().get('fiscalAddress')?.touched && form().get('fiscalAddress')?.hasError('required')">
+        formControlName="fiscalAddress" maxlength="500" placeholder="Calle principal, número y referencia" />
+      <small class="text-danger"
+        *ngIf="form().get('fiscalAddress')?.touched && form().get('fiscalAddress')?.hasError('required')">
         Campo obligatorio
       </small>
     </div>
@@ -67,12 +56,8 @@
     <!-- Correo electrónico -->
     <div class="col-md-5">
       <label class="form-label fw-semibold">Correo electrónico <span class="text-danger">*</span></label>
-      <input
-        class="form-control"
-        [class.is-invalid]="form().get('email')?.touched && form().get('email')?.invalid"
-        type="email"
-        formControlName="email"
-        placeholder="correo@dominio.com" />
+      <input class="form-control" [class.is-invalid]="form().get('email')?.touched && form().get('email')?.invalid"
+        type="email" formControlName="email" placeholder="correo@dominio.com" />
       <small class="text-danger" *ngIf="form().get('email')?.touched && form().get('email')?.hasError('required')">
         Campo obligatorio
       </small>
@@ -84,180 +69,151 @@
     <!-- Tipo de teléfono -->
     <div class="col-md-3">
       <label class="form-label fw-semibold">Tipo de teléfono</label>
-      <mf-core-shared-select
-        label="—"
-        [listOptions]="phoneTypes"
-        [control]="$any(form().get('phoneType'))"
-        bindLabel="name"
-        bindValue="id">
+      <mf-core-shared-select label="—" [listOptions]="phoneTypes" [control]="$any(form().get('phoneType'))"
+        bindLabel="name" bindValue="id">
       </mf-core-shared-select>
     </div>
 
     <!-- N.° de teléfono -->
     <div class="col-md-4">
       <label class="form-label fw-semibold">N.° de teléfono</label>
-      <input
-        class="form-control"
+      <input class="form-control"
         [class.is-invalid]="form().get('phoneNumber')?.touched && form().get('phoneNumber')?.invalid"
-        formControlName="phoneNumber"
-        [placeholder]="phonePlaceholder"
-        maxlength="15" />
-      <small class="text-danger" *ngIf="form().get('phoneNumber')?.touched && form().get('phoneNumber')?.hasError('required')">
+        formControlName="phoneNumber" [placeholder]="phonePlaceholder" maxlength="15" />
+      <small class="text-danger"
+        *ngIf="form().get('phoneNumber')?.touched && form().get('phoneNumber')?.hasError('required')">
         Campo obligatorio
       </small>
-      <small class="text-danger" *ngIf="form().get('phoneNumber')?.touched && form().get('phoneNumber')?.hasError('pattern')">
+      <small class="text-danger"
+        *ngIf="form().get('phoneNumber')?.touched && form().get('phoneNumber')?.hasError('pattern')">
         Solo números
       </small>
-      <small class="text-danger" *ngIf="form().get('phoneNumber')?.touched && form().get('phoneNumber')?.hasError('minlength')">
+      <small class="text-danger"
+        *ngIf="form().get('phoneNumber')?.touched && form().get('phoneNumber')?.hasError('minlength')">
         Mínimo {{ form().get('phoneNumber')?.errors?.['minlength']?.requiredLength }} dígitos
       </small>
     </div>
     <!-- Categoría de contribuyente (solo nacional) -->
     @if (!isForeignResidency()) {
-      <div class="col-md-6">
-        <label class="form-label fw-semibold">Categoría de contribuyente <span class="text-danger">*</span></label>
-        <mf-core-shared-select
-          label="Seleccionar..."
-          [listOptions]="taxpayerCategories"
-          [control]="$any(form().get('taxpayerCategory'))"
-          bindLabel="name"
-          bindValue="id">
-        </mf-core-shared-select>
-      </div>
+    <div class="col-md-6">
+      <label class="form-label fw-semibold">Categoría de contribuyente <span class="text-danger">*</span></label>
+      <mf-core-shared-select label="Seleccionar..." [listOptions]="taxpayerCategories"
+        [control]="$any(form().get('taxpayerCategory'))" bindLabel="name" bindValue="id">
+      </mf-core-shared-select>
+    </div>
     }
 
     <!-- Gran contribuyente (solo nacional) -->
     @if (!isForeignResidency()) {
-      <div class="col-md-6">
-        <label class="form-label fw-semibold">Gran contribuyente <span class="text-danger">*</span></label>
-        <mf-core-shared-select
-          label="Seleccionar..."
-          [listOptions]="yesNoOptions"
-          [control]="$any(form().get('largeTaxpayer'))"
-          bindLabel="name"
-          bindValue="id">
-        </mf-core-shared-select>
-      </div>
+    <div class="col-md-6">
+      <label class="form-label fw-semibold">Gran contribuyente <span class="text-danger">*</span></label>
+      <mf-core-shared-select label="Seleccionar..." [listOptions]="yesNoOptions"
+        [control]="$any(form().get('largeTaxpayer'))" bindLabel="name" bindValue="id">
+      </mf-core-shared-select>
+    </div>
     }
 
     <!-- Entidad sin fines de lucro -->
     <!-- Entidad sin fines de lucro y Artesano calificado (solo nacional, opcionales) -->
     @if (!isForeignResidency()) {
-      <div class="col-md-6">
-        <label class="form-label fw-semibold">Entidad sin fines de lucro</label>
-        <mf-core-shared-select
-          label="Seleccionar..."
-          [listOptions]="yesNoOptions"
-          [control]="$any(form().get('nonProfit'))"
-          bindLabel="name"
-          bindValue="id">
-        </mf-core-shared-select>
-      </div>
+    <div class="col-md-6">
+      <label class="form-label fw-semibold">Entidad sin fines de lucro</label>
+      <mf-core-shared-select label="Seleccionar..." [listOptions]="yesNoOptions"
+        [control]="$any(form().get('nonProfit'))" bindLabel="name" bindValue="id">
+      </mf-core-shared-select>
+    </div>
 
-      <div class="col-md-6">
-        <label class="form-label fw-semibold">Es artesano calificado</label>
-        <mf-core-shared-select
-          label="Seleccionar..."
-          [listOptions]="yesNoOptions"
-          [control]="$any(form().get('qualifiedArtisan'))"
-          bindLabel="name"
-          bindValue="id">
-        </mf-core-shared-select>
-      </div>
+    <div class="col-md-6">
+      <label class="form-label fw-semibold">Es artesano calificado</label>
+      <mf-core-shared-select label="Seleccionar..." [listOptions]="yesNoOptions"
+        [control]="$any(form().get('qualifiedArtisan'))" bindLabel="name" bindValue="id">
+      </mf-core-shared-select>
+    </div>
     }
 
     <!-- Tipo de actividad -->
     <div class="col-md-6">
       <label class="form-label fw-semibold">Tipo de actividad <span class="text-danger">*</span></label>
-      <mf-core-shared-select
-        label="Seleccionar..."
-        [listOptions]="activityTypes"
-        [control]="$any(form().get('activityType'))"
-        bindLabel="name"
-        bindValue="id">
+      <mf-core-shared-select label="Seleccionar..." [listOptions]="activityTypes"
+        [control]="$any(form().get('activityType'))" bindLabel="name" bindValue="id">
       </mf-core-shared-select>
     </div>
 
     <!-- Tipo de servicio (checkboxes, condicional) -->
     @if (showServiceType) {
-      <div class="col-12">
-        <label class="form-label fw-semibold text-uppercase small text-muted">
-          Tipo de servicio <span class="text-danger">*</span> · Puedes elegir varios
-        </label>
-        <div class="d-flex flex-wrap gap-2">
-          @for (opt of serviceTypeOptions; track opt.id) {
-            <div class="form-check form-check-inline">
-              <input class="form-check-input" type="checkbox"
-                [id]="'serviceType_' + opt.id"
-                [checked]="isServiceChecked(opt.name)"
-                (change)="toggleServiceType(opt.name, $event)" />
-              <label class="form-check-label" [for]="'serviceType_' + opt.id">{{ opt.name }}</label>
-            </div>
-          }
+    <div class="col-12">
+      <label class="form-label fw-semibold text-uppercase small text-muted">
+        Tipo de servicio <span class="text-danger">*</span> · Puedes elegir varios
+      </label>
+      <div class="d-flex flex-wrap gap-2">
+        @for (opt of serviceTypeOptions; track opt.id) {
+        <div class="form-check form-check-inline">
+          <input class="form-check-input" type="checkbox" [id]="'serviceType_' + opt.id"
+            [checked]="isServiceChecked(opt.name)" (change)="toggleServiceType(opt.name, $event)" />
+          <label class="form-check-label" [for]="'serviceType_' + opt.id">{{ opt.name }}</label>
         </div>
-        @if (form().get('serviceType')?.touched && form().get('serviceType')?.hasError('required')) {
-          <small class="text-danger"><i class="bi bi-exclamation-circle me-1"></i>Seleccione al menos un tipo de servicio.</small>
         }
       </div>
+      @if (form().get('serviceType')?.touched && form().get('serviceType')?.hasError('required')) {
+      <small class="text-danger"><i class="bi bi-exclamation-circle me-1"></i>Seleccione al menos un tipo de
+        servicio.</small>
+      }
+    </div>
     }
 
     <!-- Tipo de bien (checkboxes, condicional) -->
     @if (showGoodType) {
-      <div class="col-12">
-        <label class="form-label fw-semibold text-uppercase small text-muted">
-          Tipo de bien <span class="text-danger">*</span> · Puedes elegir varios
-        </label>
-        <div class="d-flex flex-wrap gap-2">
-          @for (opt of goodTypeOptions; track opt.id) {
-            <div class="form-check form-check-inline">
-              <input class="form-check-input" type="checkbox"
-                [id]="'goodType_' + opt.id"
-                [checked]="isGoodChecked(opt.name)"
-                (change)="toggleGoodType(opt.name, $event)" />
-              <label class="form-check-label" [for]="'goodType_' + opt.id">{{ opt.name }}</label>
-            </div>
-          }
+    <div class="col-12">
+      <label class="form-label fw-semibold text-uppercase small text-muted">
+        Tipo de bien <span class="text-danger">*</span> · Puedes elegir varios
+      </label>
+      <div class="d-flex flex-wrap gap-2">
+        @for (opt of goodTypeOptions; track opt.id) {
+        <div class="form-check form-check-inline">
+          <input class="form-check-input" type="checkbox" [id]="'goodType_' + opt.id"
+            [checked]="isGoodChecked(opt.name)" (change)="toggleGoodType(opt.name, $event)" />
+          <label class="form-check-label" [for]="'goodType_' + opt.id">{{ opt.name }}</label>
         </div>
-        @if (form().get('goodType')?.touched && form().get('goodType')?.hasError('required')) {
-          <small class="text-danger"><i class="bi bi-exclamation-circle me-1"></i>Seleccione al menos un tipo de bien.</small>
         }
       </div>
+      @if (form().get('goodType')?.touched && form().get('goodType')?.hasError('required')) {
+      <small class="text-danger"><i class="bi bi-exclamation-circle me-1"></i>Seleccione al menos un tipo de
+        bien.</small>
+      }
+    </div>
     }
 
     <!-- Retenciones que aplicarían (referencial — única sección) -->
     @if (suggestedRetentions.length) {
-      <div class="col-12">
-        <div class="border rounded p-3 bg-light">
-          <p class="mb-2">
-            <i class="bi bi-info-circle text-primary me-1"></i>
-            <strong>Retenciones que aplicarían</strong>
-            <span class="text-muted ms-1">según actividad y tipo de contribuyente · referencial</span>
-          </p>
-          <div class="d-flex flex-wrap gap-2 mb-2">
-            @for (ret of suggestedRetentions; track ret.code) {
-              <span class="badge bg-white border text-dark px-2 py-1">
-                <span class="text-primary fw-bold">{{ ret.code }}</span>
-                {{ ret.type }} · {{ ret.label }} {{ ret.percentage }}%
-              </span>
-            }
-          </div>
-          <small class="text-muted">La asignación definitiva se confirma en la pestaña <strong>Retenciones</strong>.</small>
+    <div class="col-12">
+      <div class="border rounded p-3 bg-light">
+        <p class="mb-2">
+          <i class="bi bi-info-circle text-primary me-1"></i>
+          <strong>Retenciones que aplicarían</strong>
+          <span class="text-muted ms-1">según actividad y tipo de contribuyente · referencial</span>
+        </p>
+        <div class="d-flex flex-wrap gap-2 mb-2">
+          @for (ret of suggestedRetentions; track ret.code) {
+          <span class="badge bg-white border text-dark px-2 py-1">
+            <span class="text-primary fw-bold">{{ ret.code }}</span>
+            {{ ret.type }} · {{ ret.label }} {{ ret.percentage }}%
+          </span>
+          }
         </div>
+        <small class="text-muted">La asignación definitiva se confirma en la pestaña
+          <strong>Retenciones</strong>.</small>
       </div>
+    </div>
     }
 
     <!-- Obligado a llevar contabilidad (condicional) -->
     @if (isLegalEntity()) {
-      <div class="col-md-6">
-        <label class="form-label fw-semibold">¿Obligado a llevar contabilidad? <span class="text-danger">*</span></label>
-        <mf-core-shared-select
-          label="Seleccionar..."
-          [listOptions]="yesNoOptions"
-          [control]="$any(form().get('accountingRequired'))"
-          bindLabel="name"
-          bindValue="id">
-        </mf-core-shared-select>
-      </div>
+    <div class="col-md-6">
+      <label class="form-label fw-semibold">¿Obligado a llevar contabilidad? <span class="text-danger">*</span></label>
+      <mf-core-shared-select label="Seleccionar..." [listOptions]="yesNoOptions"
+        [control]="$any(form().get('accountingRequired'))" bindLabel="name" bindValue="id">
+      </mf-core-shared-select>
+    </div>
     }
   </div>
 
@@ -265,65 +221,50 @@
   <!-- Sección 2b — Proveedor del exterior (condicional) -->
   <!-- ═══════════════════════════════════════════════ -->
   @if (isForeignResidency()) {
-    <hr class="my-4" />
+  <hr class="my-4" />
 
-    <div class="d-flex align-items-start mb-4">
-      <span class="badge rounded-circle bg-dark d-flex align-items-center justify-content-center me-3"
-            style="width: 26px; height: 26px; min-width: 26px; font-size: 0.7rem; padding: 0;">2b</span>
-      <div>
-        <h5 class="mb-0 fw-bold">Proveedor del exterior</h5>
-        <small class="text-muted">Datos requeridos para pagos al exterior y tratamiento tributario.</small>
-      </div>
+  <div class="d-flex align-items-start mb-4">
+    <span class="badge rounded-circle bg-dark d-flex align-items-center justify-content-center me-3"
+      style="width: 26px; height: 26px; min-width: 26px; font-size: 0.7rem; padding: 0;">2b</span>
+    <div>
+      <h5 class="mb-0 fw-bold">Proveedor del exterior</h5>
+      <small class="text-muted">Datos requeridos para pagos al exterior y tratamiento tributario.</small>
+    </div>
+  </div>
+
+  <div class="row g-3">
+    <!-- Pago a residente / no residente -->
+    <div class="col-md-6">
+      <label class="form-label fw-semibold">Pago a residente / no residente <span class="text-danger">*</span></label>
+      <mf-core-shared-select label="Seleccionar..." [listOptions]="residentPaymentTypes"
+        [control]="$any(form().get('residentPaymentType'))" bindLabel="name" bindValue="id">
+      </mf-core-shared-select>
     </div>
 
-    <div class="row g-3">
-      <!-- Pago a residente / no residente -->
-      <div class="col-md-6">
-        <label class="form-label fw-semibold">Pago a residente / no residente <span class="text-danger">*</span></label>
-        <mf-core-shared-select
-          label="Seleccionar..."
-          [listOptions]="residentPaymentTypes"
-          [control]="$any(form().get('residentPaymentType'))"
-          bindLabel="name"
-          bindValue="id">
-        </mf-core-shared-select>
-      </div>
-
-      <!-- Tipo de régimen fiscal -->
-      <div class="col-md-6">
-        <label class="form-label fw-semibold">Tipo de régimen fiscal <span class="text-danger">*</span></label>
-        <mf-core-shared-select
-          label="Seleccionar..."
-          [listOptions]="fiscalRegimeTypes"
-          [control]="$any(form().get('fiscalRegimeType'))"
-          bindLabel="name"
-          bindValue="id">
-        </mf-core-shared-select>
-      </div>
-
-      <!-- Aplica convenio de doble tributación -->
-      <div class="col-md-6">
-        <label class="form-label fw-semibold">Aplica convenio de doble tributación <span class="text-danger">*</span></label>
-        <mf-core-shared-select
-          label="Seleccionar..."
-          [listOptions]="yesNoOptions"
-          [control]="$any(form().get('applyDoubleTaxation'))"
-          bindLabel="name"
-          bindValue="id">
-        </mf-core-shared-select>
-      </div>
-
-      <!-- Aplica normativa legal -->
-      <div class="col-md-6">
-        <label class="form-label fw-semibold">Aplica normativa legal <span class="text-danger">*</span></label>
-        <mf-core-shared-select
-          label="Seleccionar..."
-          [listOptions]="yesNoOptions"
-          [control]="$any(form().get('applyLegalRegulations'))"
-          bindLabel="name"
-          bindValue="id">
-        </mf-core-shared-select>
-      </div>
+    <!-- Tipo de régimen fiscal -->
+    <div class="col-md-6">
+      <label class="form-label fw-semibold">Tipo de régimen fiscal <span class="text-danger">*</span></label>
+      <mf-core-shared-select label="Seleccionar..." [listOptions]="fiscalRegimeTypes"
+        [control]="$any(form().get('fiscalRegimeType'))" bindLabel="name" bindValue="id">
+      </mf-core-shared-select>
     </div>
+
+    <!-- Aplica convenio de doble tributación -->
+    <div class="col-md-6">
+      <label class="form-label fw-semibold">Aplica convenio de doble tributación <span
+          class="text-danger">*</span></label>
+      <mf-core-shared-select label="Seleccionar..." [listOptions]="yesNoOptions"
+        [control]="$any(form().get('applyDoubleTaxation'))" bindLabel="name" bindValue="id">
+      </mf-core-shared-select>
+    </div>
+
+    <!-- Aplica normativa legal -->
+    <div class="col-md-6">
+      <label class="form-label fw-semibold">Aplica normativa legal <span class="text-danger">*</span></label>
+      <mf-core-shared-select label="Seleccionar..." [listOptions]="yesNoOptions"
+        [control]="$any(form().get('applyLegalRegulations'))" bindLabel="name" bindValue="id">
+      </mf-core-shared-select>
+    </div>
+  </div>
   }
 </div>

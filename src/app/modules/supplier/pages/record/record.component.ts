@@ -22,6 +22,9 @@ import {
 } from '../../constants/supplier-catalogs';
 import { CatalogValueI } from '../../services/supplier.service';
 import { resolveCatalog, catalogToBool } from '../../../../shared/helpers/catalog.helper';
+import { StorageService } from 'src/app/shared/services/storage.service';
+import { StorageEnum } from 'src/app/shared/enum/storage.enum';
+import { SessionUserInterface } from 'src/app/shared/interfaces/user-session.interfaces';
 
 @Component({
   selector: 'mf-finance-supplier-record',
@@ -33,6 +36,8 @@ export class RecordComponent implements OnInit {
   private readonly fb = inject(FormBuilder);
   private readonly router = inject(Router);
   private readonly supplierService = inject(SupplierService);
+  /** [FEAT #018] Lectura de sesión del usuario logueado */
+  private readonly storageService = inject(StorageService);
 
   // ─── Tabs ────────────────────────────────────────
   readonly tabLabels = [
@@ -86,7 +91,7 @@ export class RecordComponent implements OnInit {
 
   private initGeneralForm(): void {
     this.generalForm = this.fb.group({
-      name: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(300)]],
+      name: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(300), Validators.pattern(/^[A-ZÁÉÍÓÚÑÜ0-9 ]+$/)]],
       commercialName: ['', [Validators.maxLength(200)]],
       contributorType: [null, Validators.required],
       residency: [null, Validators.required],
@@ -96,6 +101,9 @@ export class RecordComponent implements OnInit {
       classification: [null, Validators.required],
       status: [{ id: 1, name: 'Activo' }],
       quotaAssigned: [3000, [Validators.min(0)]],
+      // [FEAT #023] — Identificación secundaria (opcional)
+      secondaryIdentificationType: [null],
+      secondaryIdentification: [{ value: '', disabled: true }],
     });
   }
 
@@ -128,9 +136,9 @@ export class RecordComponent implements OnInit {
     this.bankingForm = this.fb.group({
       paymentMethod: [null, Validators.required],
       paymentDays: [0],
-      bankCountry: [1, Validators.required],  // Ecuador by default
-      currency: [1, Validators.required],      // USD by default
-      bankIdClassifier: ['022', Validators.required],
+      bankCountry: [null],
+      currency: [null],
+      bankIdClassifier: [''],
       bankName: [null],
       bankNameForeign: [''],
       accountType: [null],
@@ -163,7 +171,7 @@ export class RecordComponent implements OnInit {
     this.contactsForm = this.fb.group({
       contacts: this.fb.array([
         this.fb.group({
-          contactType: [1, Validators.required],
+          contactType: [2, Validators.required], // Default: Retención
           name: ['', Validators.required],
           position: [''],
           phoneType: [null],
@@ -295,6 +303,12 @@ export class RecordComponent implements OnInit {
       return;
     }
 
+    // [BUGFIX #014-A] Validar que exista al menos una retención — BLOQUEANTE
+    if (!retentions || retentions.length === 0) {
+      PubSub.publish('error', 'Debe agregar al menos una retención antes de guardar.');
+      return;
+    }
+
     // Debug: mostrar qué formularios son inválidos
     const formStatus = {
       general: this.generalForm.valid,
@@ -325,6 +339,15 @@ export class RecordComponent implements OnInit {
 
     this.isSubmitting = true;
 
+    // [FEAT #018] Leer sesión del usuario logueado
+    const sessionRaw = this.storageService.getLocalStorage(StorageEnum.USER_SESSION);
+    if (!sessionRaw) {
+      this.isSubmitting = false;
+      PubSub.publish('error', 'No se encontró la sesión del usuario. Inicie sesión nuevamente.');
+      return;
+    }
+    const sessionUser = JSON.parse(JSON.stringify(sessionRaw)) as SessionUserInterface;
+
     const g = this.generalForm.getRawValue();
     const f = this.fiscalForm.getRawValue();
     const b = this.bankingForm.getRawValue();
@@ -336,6 +359,11 @@ export class RecordComponent implements OnInit {
       contributorType: resolveCatalog(CONTRIBUTOR_TYPES, g.contributorType)!,
       identificationType: resolveCatalog(IDENTIFICATION_TYPES, g.identificationType)!,
       identification: g.identification,
+      // [FEAT #023] — Identificación secundaria (opcional)
+      secondaryIdentificationType: g.secondaryIdentificationType
+        ? resolveCatalog(IDENTIFICATION_TYPES, g.secondaryIdentificationType) || null
+        : null,
+      secondaryIdentification: g.secondaryIdentification || null,
       frequency: resolveCatalog(FREQUENCIES, g.frequency)!,
       residency: resolveCatalog(RESIDENCIES, g.residency)!,
       classification: resolveCatalog(CLASSIFICATIONS, g.classification)!,
@@ -360,20 +388,20 @@ export class RecordComponent implements OnInit {
       accountingRequired: catalogToBool(f.accountingRequired),
       paymentMethod: resolveCatalog(PAYMENT_METHODS, b.paymentMethod)!,
       paymentDays: b.paymentDays || 0,
-      bankCountry: resolveCatalog(COUNTRIES, b.bankCountry) || undefined,
-      currency: resolveCatalog(CURRENCIES, b.currency)?.name || 'USD',
-      bankIdClassifier: b.bankIdClassifier || '022',
-      bankName: b.bankNameForeign || resolveCatalog(BANK_NAMES, b.bankName)?.name || undefined,
-      accountType: resolveCatalog(ACCOUNT_TYPES, b.accountType)?.name || undefined,
-      accountNumber: b.accountNumber ? String(b.accountNumber) : undefined, // [BUGFIX #001]
-      accountHolder: b.accountHolder || undefined,
-      paymentId: b.paymentId || undefined,
-      paymentIdType: resolveCatalog(PAYMENT_ID_TYPES, b.paymentIdType)?.name || undefined,
+      bankCountry: this.isForeignResidency ? undefined : (resolveCatalog(COUNTRIES, b.bankCountry) || undefined), // [BUGFIX #019]
+      currency: this.isForeignResidency ? undefined : (resolveCatalog(CURRENCIES, b.currency)?.name || 'USD'),
+      bankIdClassifier: this.isForeignResidency ? undefined : (b.bankIdClassifier || '022'),
+      bankName: this.isForeignResidency ? undefined : (b.bankNameForeign || resolveCatalog(BANK_NAMES, b.bankName)?.name || undefined),
+      accountType: this.isForeignResidency ? undefined : (resolveCatalog(ACCOUNT_TYPES, b.accountType)?.name || undefined),
+      accountNumber: b.accountNumber ? String(b.accountNumber) : undefined, // requerido en Transferencia (nacional y extranjero)
+      accountHolder: this.isForeignResidency ? undefined : (b.accountHolder || undefined),
+      paymentId: this.isForeignResidency ? undefined : (b.paymentId || undefined),
+      paymentIdType: this.isForeignResidency ? undefined : (resolveCatalog(PAYMENT_ID_TYPES, b.paymentIdType)?.name || undefined),
       thirdPartyPayment: resolveCatalog(YES_NO, b.thirdPartyPayment)?.name === 'SI',
 
       paymentEmail1: b.paymentEmail1,
       paymentEmail2: b.paymentEmail2 || undefined,
-      quotaAssigned: this.isFrequencyOccasional ? g.quotaAssigned : undefined,
+      quotaAssigned: this.isFrequencyOccasional ? Number(g.quotaAssigned) : undefined,
       contacts: contacts.map((c: any) => ({
         contactType: resolveCatalog(CONTACT_TYPES, c.contactType)?.name || c.contactType,
         name: c.name || undefined,
@@ -406,6 +434,14 @@ export class RecordComponent implements OnInit {
         status: r.status,
         effectiveDate: new Date().toISOString().split('T')[0],
       })) : undefined,
+
+      // [FEAT #018] Sesión del usuario logueado
+      sessionUser: {
+        id: sessionUser.id,
+        firstname: sessionUser.firstname,
+        lastname: sessionUser.lastname,
+        email: sessionUser.email
+      },
     };
 
     this.supplierService.createSupplier(payload).subscribe({
@@ -416,7 +452,7 @@ export class RecordComponent implements OnInit {
       error: (err) => {
         this.isSubmitting = false;
         const message = err?.error?.message || 'Error al crear el proveedor';
-        PubSub.publish('error', message);
+        console.error('[Supplier Record] Error:', message);
       },
     });
   }

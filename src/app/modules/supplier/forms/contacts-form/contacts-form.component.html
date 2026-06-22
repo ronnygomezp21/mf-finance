@@ -2,91 +2,107 @@
 
   <div formArrayName="contacts">
     @for (contact of contactsArray.controls; track $index) {
-      <div class="border rounded p-4 bg-white mb-4">
-        <div class="d-flex align-items-start gap-2 mb-3">
-          <span class="badge rounded-pill bg-primary text-white d-flex align-items-center justify-content-center"
-            style="width:28px; height:28px; font-size:0.8rem;">{{ $index + 4 }}</span>
-          <div>
-            <h6 class="fw-bold mb-0" style="font-size:0.95rem;">{{ $index === 0 ? 'Contacto principal' : 'Contacto adicional #' + $index }}</h6>
-            <small class="text-muted">{{ $index === 0 ? 'Persona principal de contacto del proveedor. Su correo es obligatorio.' : 'Datos del contacto adicional.' }}</small>
+    <div class="border rounded p-4 bg-white mb-4">
+      <div class="d-flex align-items-start gap-2 mb-3">
+        <span class="badge rounded-pill bg-primary text-white d-flex align-items-center justify-content-center"
+          style="width:28px; height:28px; font-size:0.8rem;">{{ $index + 4 }}</span>
+        <div>
+          <h6 class="fw-bold mb-0" style="font-size:0.95rem;">{{ $index === 0 ? 'Contacto principal' : 'Contacto
+            adicional #' + $index }}</h6>
+          <small class="text-muted">{{ $index === 0 ? 'Persona principal de contacto del proveedor. Su correo es
+            obligatorio.' : 'Datos del contacto adicional.' }}</small>
+        </div>
+        @if ($index > 0) {
+        <button class="btn btn-outline-danger btn-sm ms-auto" (click)="removeContact($index)">
+          <i class="bi bi-x-lg me-1"></i>Quitar
+        </button>
+        }
+      </div>
+
+      <div [formGroupName]="$index">
+        <!-- Fila 1: Tipo de contacto (select) + Nombre del contacto -->
+        <div class="row g-3 mb-3">
+          <div class="col-md-6">
+            <label class="form-label fw-semibold" style="font-size:0.82rem;">Tipo de contacto <span
+                class="text-danger">*</span></label>
+            <mf-core-shared-select label="Seleccionar..." [listOptions]="contactTypes"
+              [control]="$any(contact.get('contactType'))" bindLabel="name" bindValue="id" [isRequired]="true"
+              [setData]="defaultContactTypeId">
+            </mf-core-shared-select>
           </div>
-          @if ($index > 0) {
-            <button class="btn btn-outline-danger btn-sm ms-auto" (click)="removeContact($index)">
-              <i class="bi bi-x-lg me-1"></i>Quitar
-            </button>
-          }
+          <div class="col-md-6">
+            <label class="form-label fw-semibold" style="font-size:0.82rem;">Nombre del contacto <span
+                class="text-danger">*</span></label>
+            <input class="form-control" formControlName="name" placeholder="Nombre y apellido" style="height:48px;"
+              [ngClass]="{'is-invalid': contact.get('name')?.touched && contact.get('name')?.hasError('required')}" />
+            @if (contact.get('name')?.touched && contact.get('name')?.hasError('required')) {
+            <small class="text-danger"><i class="bi bi-exclamation-circle me-1"></i>El nombre del contacto {{ $index ===
+              0 ? 'principal' : '' }} es obligatorio.</small>
+            }
+          </div>
         </div>
 
-        <div [formGroupName]="$index">
-          <!-- Fila 1: Tipo de contacto (select) + Nombre del contacto -->
-          <div class="row g-3 mb-3">
-            <div class="col-md-6">
-              <label class="form-label fw-semibold" style="font-size:0.82rem;">Tipo de contacto <span class="text-danger">*</span></label>
-              <mf-core-shared-select label="Seleccionar..." [listOptions]="contactTypes"
-                [control]="$any(contact.get('contactType'))" bindLabel="name" bindValue="id" [isRequired]="true">
-              </mf-core-shared-select>
-            </div>
-            <div class="col-md-6">
-              <label class="form-label fw-semibold" style="font-size:0.82rem;">Nombre del contacto <span class="text-danger">*</span></label>
-              <input class="form-control" formControlName="name" placeholder="Nombre y apellido" style="height:48px;"
-                [ngClass]="{'is-invalid': contact.get('name')?.touched && contact.get('name')?.hasError('required')}" />
-              @if (contact.get('name')?.touched && contact.get('name')?.hasError('required')) {
-                <small class="text-danger"><i class="bi bi-exclamation-circle me-1"></i>El nombre del contacto {{ $index === 0 ? 'principal' : '' }} es obligatorio.</small>
-              }
-            </div>
+        <!-- Fila 2: Cargo + Tipo de teléfono (select) + N.° de teléfono -->
+        <div class="row g-3 mb-3">
+          <div class="col-md-6">
+            <label class="form-label fw-semibold" style="font-size:0.82rem;">Cargo</label>
+            <input class="form-control" formControlName="position" placeholder="Ej. Gerente financiero"
+              style="height:48px;" />
           </div>
-
-          <!-- Fila 2: Cargo + Tipo de teléfono (select) + N.° de teléfono -->
-          <div class="row g-3 mb-3">
-            <div class="col-md-6">
-              <label class="form-label fw-semibold" style="font-size:0.82rem;">Cargo</label>
-              <input class="form-control" formControlName="position" placeholder="Ej. Gerente financiero" style="height:48px;" />
-            </div>
-            <div class="col-md-3">
-              <label class="form-label fw-semibold" style="font-size:0.82rem;">Tipo de teléfono</label>
-              <mf-core-shared-select label="Seleccionar..." [listOptions]="phoneTypes"
-                [control]="$any(contact.get('phoneType'))" bindLabel="name" bindValue="id"
-                (valueChange)="onPhoneTypeChange($index)">
-              </mf-core-shared-select>
-            </div>
-            <div class="col-md-3">
-              <label class="form-label fw-semibold" style="font-size:0.82rem;">N.° de teléfono</label>
-              <input class="form-control" formControlName="phoneNumber" placeholder="10-15 dígitos" style="height:48px;" type="number"
-                [ngClass]="{'is-invalid': contact.get('phoneNumber')?.touched && contact.get('phoneNumber')?.hasError('required')}" />
-              @if (contact.get('phoneNumber')?.touched && contact.get('phoneNumber')?.hasError('required')) {
-                <small class="text-danger"><i class="bi bi-exclamation-circle me-1"></i>El número de teléfono es obligatorio si seleccionó tipo.</small>
-              }
-            </div>
+          <div class="col-md-3">
+            <label class="form-label fw-semibold" style="font-size:0.82rem;">Tipo de teléfono</label>
+            <mf-core-shared-select label="Seleccionar..." [listOptions]="phoneTypes"
+              [control]="$any(contact.get('phoneType'))" bindLabel="name" bindValue="id"
+              (valueChange)="onPhoneTypeChange($index)">
+            </mf-core-shared-select>
           </div>
+          <div class="col-md-3">
+            <label class="form-label fw-semibold" style="font-size:0.82rem;">N.° de teléfono</label>
+            <input class="form-control" formControlName="phoneNumber" placeholder="10-15 dígitos" style="height:48px;"
+              type="number"
+              [ngClass]="{'is-invalid': contact.get('phoneNumber')?.touched && contact.get('phoneNumber')?.hasError('required')}" />
+            @if (contact.get('phoneNumber')?.touched && contact.get('phoneNumber')?.hasError('required')) {
+            <small class="text-danger"><i class="bi bi-exclamation-circle me-1"></i>El número de teléfono es obligatorio
+              si seleccionó tipo.</small>
+            }
+          </div>
+        </div>
 
-          <!-- Fila 3: Correo electrónico 1 + Correo electrónico 2 -->
-          <div class="row g-3">
-            <div class="col-md-6">
-              <label class="form-label fw-semibold" style="font-size:0.82rem;">Correo electrónico 1 <span class="text-danger">*</span></label>
-              <input class="form-control" type="email" formControlName="email1" placeholder="contacto@dominio.com" style="height:48px;"
-                [ngClass]="{'is-invalid': contact.get('email1')?.touched && (contact.get('email1')?.hasError('required') || contact.get('email1')?.hasError('email'))}" />
-              @if (contact.get('email1')?.touched && contact.get('email1')?.hasError('required')) {
-                <small class="text-danger"><i class="bi bi-exclamation-circle me-1"></i>El correo del contacto {{ $index === 0 ? 'principal' : '' }} es obligatorio (RN-05).</small>
-              }
-              @if (contact.get('email1')?.touched && contact.get('email1')?.hasError('email') && !contact.get('email1')?.hasError('required')) {
-                <small class="text-danger"><i class="bi bi-exclamation-circle me-1"></i>Ingrese un correo electrónico válido.</small>
-              }
-            </div>
-            <div class="col-md-6">
-              <label class="form-label fw-semibold" style="font-size:0.82rem;">Correo electrónico 2</label>
-              <input class="form-control" type="email" formControlName="email2" placeholder="Opcional" style="height:48px;" />
-            </div>
+        <!-- Fila 3: Correo electrónico 1 + Correo electrónico 2 -->
+        <div class="row g-3">
+          <div class="col-md-6">
+            <label class="form-label fw-semibold" style="font-size:0.82rem;">Correo electrónico 1 <span
+                class="text-danger">*</span></label>
+            <input class="form-control" type="email" formControlName="email1" placeholder="contacto@dominio.com"
+              style="height:48px;"
+              [ngClass]="{'is-invalid': contact.get('email1')?.touched && (contact.get('email1')?.hasError('required') || contact.get('email1')?.hasError('email'))}" />
+            @if (contact.get('email1')?.touched && contact.get('email1')?.hasError('required')) {
+            <small class="text-danger"><i class="bi bi-exclamation-circle me-1"></i>El correo del contacto {{ $index ===
+              0 ? 'principal' : '' }} es obligatorio (RN-05).</small>
+            }
+            @if (contact.get('email1')?.touched && contact.get('email1')?.hasError('email') &&
+            !contact.get('email1')?.hasError('required')) {
+            <small class="text-danger"><i class="bi bi-exclamation-circle me-1"></i>Ingrese un correo electrónico
+              válido.</small>
+            }
+          </div>
+          <div class="col-md-6">
+            <label class="form-label fw-semibold" style="font-size:0.82rem;">Correo electrónico 2</label>
+            <input class="form-control" type="email" formControlName="email2" placeholder="Opcional"
+              style="height:48px;" />
           </div>
         </div>
       </div>
+    </div>
     }
   </div>
 
   <!-- Botón agregar contacto -->
-  <div class="border border-dashed rounded p-3 text-center" style="border-style:dashed !important; cursor:pointer;" (click)="addContact()">
+  <!-- <div class="border border-dashed rounded p-3 text-center" style="border-style:dashed !important; cursor:pointer;"
+    (click)="addContact()">
     <span class="text-primary fw-semibold" style="font-size:0.9rem;">
       <i class="bi bi-plus-lg me-1"></i>Agregar otro contacto
     </span>
-  </div>
+  </div> -->
 
 </div>

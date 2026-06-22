@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "scripts": {
     "ng": "ng",
-    "start": "ng serve",
+    "start": "node scripts/load-env.js && ng serve",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
@@ -31,8 +31,10 @@
     "@angular/router": "^19.0.0",
     "@neocore/lib-components": "file:neocore-lib-components-0.0.15.tgz",
     "@ng-bootstrap/ng-bootstrap": "^18.0.0",
-    "bootstrap": "^5.3.8",
     "@ng-select/ng-select": "^14.9.0",
+    "bootstrap": "^5.3.8",
+    "dotenv": "^17.4.2",
+    "encrypt-storage": "^2.14.7",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0",
     "zone.js": "~0.15.0"

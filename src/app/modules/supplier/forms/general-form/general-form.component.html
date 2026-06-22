@@ -2,7 +2,7 @@
   <!-- Header con número y título -->
   <div class="d-flex align-items-start mb-4">
     <span class="badge rounded-circle bg-dark d-flex align-items-center justify-content-center me-3"
-          style="width: 26px; height: 26px; min-width: 26px; font-size: 0.75rem; padding: 0;">1</span>
+      style="width: 26px; height: 26px; min-width: 26px; font-size: 0.75rem; padding: 0;">1</span>
     <div>
       <h5 class="mb-0 fw-bold">Datos Generales</h5>
       <small class="text-muted">Identificación, tipo de persona y clasificación del proveedor.</small>
@@ -13,18 +13,17 @@
     <!-- Nombre del proveedor — full width -->
     <div class="col-12">
       <div class="d-flex justify-content-between">
-        <label class="form-label fw-semibold">Nombre del proveedor (razón social) <span class="text-danger">*</span></label>
+        <label class="form-label fw-semibold">Nombre del proveedor (razón social) <span
+            class="text-danger">*</span></label>
         <small class="text-muted">{{ form().get('name')?.value?.length || 0 }} / 300</small>
       </div>
-      <input
-        class="form-control"
-        [class.is-invalid]="form().get('name')?.touched && form().get('name')?.invalid"
-        formControlName="name"
-        (input)="onNameInput($event)"
-        maxlength="300"
-        placeholder="RAZÓN SOCIAL DEL PROVEEDOR" />
+      <input class="form-control" [class.is-invalid]="form().get('name')?.touched && form().get('name')?.invalid"
+        formControlName="name" (input)="onNameInput($event)" maxlength="300" placeholder="RAZÓN SOCIAL DEL PROVEEDOR" />
       <small class="text-danger" *ngIf="form().get('name')?.touched && form().get('name')?.hasError('required')">
         Campo obligatorio
+      </small>
+      <small class="text-danger" *ngIf="form().get('name')?.touched && form().get('name')?.hasError('pattern')">
+        <i class="bi bi-exclamation-circle me-1"></i>No se permiten caracteres especiales en el nombre.
       </small>
     </div>
 
@@ -40,114 +39,128 @@
     <!-- Tipo de contribuyente -->
     <div class="col-md-6">
       <label class="form-label fw-semibold">Tipo de contribuyente <span class="text-danger">*</span></label>
-      <mf-core-shared-select
-        label="Seleccionar..."
-        [listOptions]="contributorTypes"
-        [control]="$any(form().get('contributorType'))"
-        bindLabel="name"
-        bindValue="id">
+      <mf-core-shared-select label="Seleccionar..." [listOptions]="contributorTypes"
+        [control]="$any(form().get('contributorType'))" bindLabel="name" bindValue="id">
       </mf-core-shared-select>
     </div>
 
     <!-- Residencia -->
     <div class="col-md-6">
       <label class="form-label fw-semibold">Residencia <span class="text-danger">*</span></label>
-      <mf-core-shared-select
-        label="Seleccionar..."
-        [listOptions]="residencies"
-        [control]="$any(form().get('residency'))"
-        bindLabel="name"
-        bindValue="id">
+      <mf-core-shared-select label="Seleccionar..." [listOptions]="residencies"
+        [control]="$any(form().get('residency'))" bindLabel="name" bindValue="id">
       </mf-core-shared-select>
     </div>
 
     <!-- Tipo de identificación -->
     <div class="col-md-6">
       <label class="form-label fw-semibold">Tipo de identificación <span class="text-danger">*</span></label>
-      <mf-core-shared-select
-        label="Seleccionar..."
-        [listOptions]="filteredIdentificationTypes"
-        [control]="$any(form().get('identificationType'))"
-        bindLabel="name"
-        bindValue="id">
+      <mf-core-shared-select label="Seleccionar..." [listOptions]="filteredIdentificationTypes"
+        [control]="$any(form().get('identificationType'))" bindLabel="name" bindValue="id">
       </mf-core-shared-select>
     </div>
 
     <!-- Identificación -->
     <div class="col-md-6">
       <label class="form-label fw-semibold">Identificación <span class="text-danger">*</span></label>
-      <input
-        class="form-control"
+      <input class="form-control"
         [class.is-invalid]="form().get('identification')?.touched && form().get('identification')?.invalid"
-        formControlName="identification"
-        [placeholder]="identificationPlaceholder"
-        [maxlength]="identificationMaxLength"
+        formControlName="identification" [placeholder]="identificationPlaceholder" [maxlength]="identificationMaxLength"
         (input)="onIdentificationInput($event)" />
-      <small class="text-danger" *ngIf="form().get('identification')?.touched && form().get('identification')?.hasError('required')">
+      <small class="text-danger"
+        *ngIf="form().get('identification')?.touched && form().get('identification')?.hasError('required')">
         Campo obligatorio
       </small>
-      <small class="text-danger" *ngIf="form().get('identification')?.touched && form().get('identification')?.hasError('cedulaInvalida')">
+      <small class="text-danger"
+        *ngIf="form().get('identification')?.touched && form().get('identification')?.hasError('cedulaInvalida')">
         Cédula inválida
       </small>
-      <small class="text-danger" *ngIf="form().get('identification')?.touched && form().get('identification')?.hasError('minlength')">
+      <small class="text-danger"
+        *ngIf="form().get('identification')?.touched && form().get('identification')?.hasError('rucInvalido')">
+        RUC inválido — verifique el número de identificación
+      </small>
+      <!-- <small class="text-danger"
+        *ngIf="form().get('identification')?.touched && form().get('identification')?.hasError('minlength')">
         El RUC debe tener exactamente 13 dígitos
+      </small> -->
+    </div>
+
+    <!-- [FEAT #023] Tipo de identificación secundaria -->
+    <div class="col-md-6">
+      <label class="form-label fw-semibold">Tipo de identificación secundaria</label>
+      <mf-core-shared-select label="Seleccionar..." [listOptions]="allSecondaryIdentificationTypes"
+        [control]="$any(form().get('secondaryIdentificationType'))" bindLabel="name" bindValue="id">
+      </mf-core-shared-select>
+    </div>
+
+    <!-- [FEAT #023] Identificación secundaria -->
+    <div class="col-md-6">
+      <label class="form-label fw-semibold">Identificación secundaria</label>
+      <input class="form-control"
+        [class.is-invalid]="form().get('secondaryIdentification')?.touched && form().get('secondaryIdentification')?.invalid"
+        formControlName="secondaryIdentification"
+        [placeholder]="secondaryIdentificationPlaceholder"
+        [maxlength]="secondaryIdentificationMaxLength"
+        (input)="onSecondaryIdentificationInput($event)" />
+      <small class="text-danger"
+        *ngIf="form().get('secondaryIdentification')?.touched && form().get('secondaryIdentification')?.hasError('required')">
+        Campo obligatorio
+      </small>
+      <small class="text-danger"
+        *ngIf="form().get('secondaryIdentification')?.touched && form().get('secondaryIdentification')?.hasError('cedulaInvalida')">
+        Cédula inválida
+      </small>
+      <small class="text-danger"
+        *ngIf="form().get('secondaryIdentification')?.touched && form().get('secondaryIdentification')?.hasError('rucInvalido')">
+        RUC inválido — verifique el número de identificación
       </small>
     </div>
 
     <!-- Frecuencia -->
     <div class="col-md-6">
       <label class="form-label fw-semibold">Frecuencia <span class="text-danger">*</span></label>
-      <mf-core-shared-select
-        label="Seleccionar..."
-        [listOptions]="frequencies"
-        [control]="$any(form().get('frequency'))"
-        bindLabel="name"
-        bindValue="id">
+      <mf-core-shared-select label="Seleccionar..." [listOptions]="frequencies"
+        [control]="$any(form().get('frequency'))" bindLabel="name" bindValue="id">
       </mf-core-shared-select>
     </div>
 
     <!-- Cupo asignado (condicional por frecuencia) -->
     @if (isFrequencyOccasional) {
-      <div class="col-md-6">
-        <label class="form-label fw-semibold">Cupo asignado <span class="text-danger">*</span></label>
-        <div class="input-group">
-          <span class="input-group-text">$</span>
-          <input class="form-control" type="number" formControlName="quotaAssigned" placeholder="3000" />
-        </div>
+    <div class="col-md-6">
+      <label class="form-label fw-semibold">Cupo asignado <span class="text-danger">*</span></label>
+      <div class="input-group">
+        <span class="input-group-text">$</span>
+        <input class="form-control" type="number" formControlName="quotaAssigned" placeholder="3000" />
       </div>
+    </div>
     } @else if (isFrequencyPermanent) {
-      <div class="col-md-6">
-        <label class="form-label fw-semibold">Cupo asignado</label>
-        <div class="d-flex align-items-center gap-2 px-3 rounded" style="min-height: 48px; height: 48px; background-color: #f8f9fa; border: 1px solid #dee2e6;">
-          <i class="bi bi-lock text-muted" style="font-size: 0.9rem;"></i>
-          <span class="fw-bold text-dark" style="font-size: 0.85rem;">No aplica</span>
-          <span class="text-muted" style="font-size: 0.85rem;">el cupo solo aplica a proveedores habituales</span>
-        </div>
+    <div class="col-md-6">
+      <label class="form-label fw-semibold">Cupo asignado</label>
+      <div class="d-flex align-items-center gap-2 px-3 rounded"
+        style="min-height: 48px; height: 48px; background-color: #f8f9fa; border: 1px solid #dee2e6;">
+        <i class="bi bi-lock text-muted" style="font-size: 0.9rem;"></i>
+        <span class="fw-bold text-dark" style="font-size: 0.85rem;">No aplica</span>
+        <span class="text-muted" style="font-size: 0.85rem;">el cupo solo aplica a proveedores habituales</span>
       </div>
+    </div>
     }
 
     <!-- Clasificación del proveedor -->
     <div class="col-md-6">
       <label class="form-label fw-semibold">Clasificación del proveedor <span class="text-danger">*</span></label>
-      <mf-core-shared-select
-        label="Seleccionar..."
-        [listOptions]="classifications"
-        [control]="$any(form().get('classification'))"
-        bindLabel="name"
-        bindValue="id">
+      <mf-core-shared-select label="Seleccionar..." [listOptions]="classifications"
+        [control]="$any(form().get('classification'))" bindLabel="name" bindValue="id">
       </mf-core-shared-select>
     </div>
 
     <!-- Estado -->
+    @if (isEditMode()) {
     <div class="col-md-6">
       <label class="form-label fw-semibold">Estado <span class="text-danger">*</span></label>
-      <mf-core-shared-select
-        label="Seleccionar..."
-        [listOptions]="supplierStatus"
-        [control]="$any(form().get('status'))"
-        bindLabel="name"
-        bindValue="id">
+      <mf-core-shared-select label="Seleccionar..." [listOptions]="supplierStatus"
+        [control]="$any(form().get('status'))" bindLabel="name" bindValue="id">
       </mf-core-shared-select>
     </div>
+    }
   </div>
 </div>

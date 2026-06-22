@@ -46,6 +46,8 @@
     </div>
 
     <div class="row g-3 mt-2">
+      <!-- [BUGFIX #019] Campos bancarios solo para proveedores nacionales -->
+      @if (!isForeignResidency()) {
       <div class="col-md-4">
         <label class="form-label fw-semibold" style="font-size:0.82rem;">País del banco <span
             class="text-danger">*</span></label>
@@ -78,28 +80,13 @@
       </div>
 
       <!-- Banco local (select) — solo residentes nacionales -->
-      @if (!isForeignResidency()) {
-        <div class="col-md-4">
-          <label class="form-label fw-semibold" style="font-size:0.82rem;">Banco <span
-              class="text-danger">*</span></label>
-          <mf-core-shared-select label="Seleccionar..." [listOptions]="bankNames" [control]="$any(form().get('bankName'))"
-            bindLabel="name" bindValue="id" [isRequired]="true">
-          </mf-core-shared-select>
-        </div>
-      }
-
-      <!-- Banco exterior (texto libre) — solo residentes extranjeros -->
-      @if (isForeignResidency()) {
-        <div class="col-md-4">
-          <label class="form-label fw-semibold" style="font-size:0.82rem;">Banco (exterior) <span
-              class="text-danger">*</span></label>
-          <input class="form-control" formControlName="bankNameForeign" placeholder="Nombre del banco exterior" style="height:48px;"
-            [ngClass]="{'is-invalid': form().get('bankNameForeign')?.touched && form().get('bankNameForeign')?.hasError('required')}" />
-          @if (form().get('bankNameForeign')?.touched && form().get('bankNameForeign')?.hasError('required')) {
-            <small class="text-danger"><i class="bi bi-exclamation-circle me-1"></i>Campo obligatorio.</small>
-          }
-        </div>
-      }
+      <div class="col-md-4">
+        <label class="form-label fw-semibold" style="font-size:0.82rem;">Banco <span
+            class="text-danger">*</span></label>
+        <mf-core-shared-select label="Seleccionar..." [listOptions]="bankNames" [control]="$any(form().get('bankName'))"
+          bindLabel="name" bindValue="id" [isRequired]="true">
+        </mf-core-shared-select>
+      </div>
 
       <div class="col-md-4">
         <label class="form-label fw-semibold" style="font-size:0.82rem;">Tipo de cuenta <span
@@ -107,16 +94,6 @@
         <mf-core-shared-select label="Seleccionar..." [listOptions]="accountTypes"
           [control]="$any(form().get('accountType'))" bindLabel="name" bindValue="id" [isRequired]="true">
         </mf-core-shared-select>
-      </div>
-
-      <div class="col-md-4">
-        <label class="form-label fw-semibold" style="font-size:0.82rem;">Número de cuenta <span
-            class="text-danger">*</span></label>
-        <input class="form-control" type="number" formControlName="accountNumber" placeholder="Número de cuenta" style="height:48px;"
-          [ngClass]="{'is-invalid': form().get('accountNumber')?.touched && form().get('accountNumber')?.hasError('required')}" />
-        @if (form().get('accountNumber')?.touched && form().get('accountNumber')?.hasError('required')) {
-        <small class="text-danger"><i class="bi bi-exclamation-circle me-1"></i>Campo obligatorio.</small>
-        }
       </div>
 
       <div class="col-md-4">
@@ -147,6 +124,18 @@
           <small class="text-danger"><i class="bi bi-exclamation-circle me-1"></i>Campo obligatorio.</small>
         }
       </div>
+      } <!-- fin @if (!isForeignResidency()) -->
+
+      <!-- Número de cuenta — requerido para Transferencia (nacional y extranjero) -->
+      <div class="col-md-4">
+        <label class="form-label fw-semibold" style="font-size:0.82rem;">Número de cuenta <span
+            class="text-danger">*</span></label>
+        <input class="form-control" type="number" formControlName="accountNumber" placeholder="Número de cuenta" style="height:48px;"
+          [ngClass]="{'is-invalid': form().get('accountNumber')?.touched && form().get('accountNumber')?.hasError('required')}" />
+        @if (form().get('accountNumber')?.touched && form().get('accountNumber')?.hasError('required')) {
+        <small class="text-danger"><i class="bi bi-exclamation-circle me-1"></i>Campo obligatorio.</small>
+        }
+      </div>
 
       <!-- ¿Pago a un tercero? -->
       <div class="col-md-4">
@@ -167,8 +156,8 @@
       </div>
     </div>
 
-    <!-- Advertencia: titular ≠ razón social -->
-    @if (holderMismatch) {
+    <!-- Advertencia: titular ≠ razón social (solo nacional) -->
+    @if (!isForeignResidency() && holderMismatch) {
       <div class="alert alert-warning d-flex align-items-start gap-2 mt-3 mb-0 py-2 px-3" role="alert"
         style="font-size:0.82rem; border-radius:6px;">
         <i class="bi bi-exclamation-circle-fill mt-1"></i>
