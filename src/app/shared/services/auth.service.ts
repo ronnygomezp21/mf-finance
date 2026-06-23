@@ -9,47 +9,47 @@
 // import { StorageService } from './storage.service';
 
 // @Injectable({
-//   providedIn: 'root',
+//     providedIn: 'root',
 // })
 // export class AuthService {
-//   private urlApi: string = environment.apiUrl!;
+//     private urlApi: string = environment.apiUrl!;
 
-//   // [AI-GENERATED | skill: mf-refactor-skill | Patr?n 18 | model: gemini-2-5-pro]
-//   private readonly http = inject(HttpClient);
-//   private readonly storageService = inject(StorageService);
-//   private readonly permissionService = inject(PermissionService);
+//     // [AI-GENERATED | skill: mf-refactor-skill | Patr?n 18 | model: gemini-2-5-pro]
+//     private readonly http = inject(HttpClient);
+//     private readonly storageService = inject(StorageService);
+//     private readonly permissionService = inject(PermissionService);
 
-//   constructor() {}
+//     constructor() { }
 
-//   refreshToken(
-//     sessionId: number,
-//   ): Observable<ServiceResponseInterface<string>> {
-//     const headers = new HttpHeaders().set(
-//       'x-refresh-token',
-//       `${this.storageService.getLocalStorage('REFRESH_TOKEN')}`,
-//     );
-//     return this.http.post<ServiceResponseInterface<string>>(
-//       `${this.urlApi}/${MsPrefixEnum.CORE}/authentication/refresh-token/${sessionId}`,
-//       {},
-//       { headers },
-//     );
-//   }
+//     refreshToken(
+//         sessionId: number,
+//     ): Observable<ServiceResponseInterface<string>> {
+//         const headers = new HttpHeaders().set(
+//             'x-refresh-token',
+//             `${this.storageService.getLocalStorage('REFRESH_TOKEN')}`,
+//         );
+//         return this.http.post<ServiceResponseInterface<string>>(
+//             `${this.urlApi}/${MsPrefixEnum.CORE}/authentication/refresh-token/${sessionId}`,
+//             {},
+//             { headers },
+//         );
+//     }
 
-//   resetPassword(
-//     password: string,
-//     userId: number,
-//     currentPassword?: string,
-//   ): Observable<ServiceResponseInterface<string>> {
-//     const headers = this.permissionService.setHeaders(
-//       `${ActionsUser.resource}:${ActionsUser.crear}`,
-//     );
-//     return this.http.put<ServiceResponseInterface<string>>(
-//       `${this.urlApi}/${MsPrefixEnum.CORE}/user/pwd/${userId}`,
-//       {
-//         password,
-//         currentPassword,
-//       },
-//       { headers },
-//     );
-//   }
+//     resetPassword(
+//         password: string,
+//         userId: number,
+//         currentPassword?: string,
+//     ): Observable<ServiceResponseInterface<string>> {
+//         const headers = this.permissionService.setHeaders(
+//             `${ActionsUser.resource}:${ActionsUser.crear}`,
+//         );
+//         return this.http.put<ServiceResponseInterface<string>>(
+//             `${this.urlApi}/${MsPrefixEnum.CORE}/user/pwd/${userId}`,
+//             {
+//                 password,
+//                 currentPassword,
+//             },
+//             { headers },
+//         );
+//     }
 // }
