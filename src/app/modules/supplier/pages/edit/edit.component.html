@@ -14,14 +14,11 @@
 
   @if (!isLoading) {
     <!-- Header -->
-    <div class="d-flex justify-content-between align-items-center mb-4">
-      <div>
-        <h4 class="mb-0 fw-bold">Editar Proveedor</h4>
-        @if (supplierCode) {
-          <small class="text-muted">Código: {{ supplierCode }}</small>
-        }
-      </div>
-      <span class="badge bg-success px-3 py-2">{{ generalForm.get('status')?.value?.name || 'Activo' }}</span>
+    <div class="mb-4">
+      <h4 class="mb-0 fw-bold">Editar Proveedor</h4>
+      @if (supplierCode) {
+        <small class="text-muted">Código: {{ supplierCode }}</small>
+      }
     </div>
 
     <!-- Tabs -->
@@ -85,7 +82,7 @@
       }
       @if (activeTab > 0) {
         <button class="btn btn-outline-secondary d-flex align-items-center justify-content-center" (click)="prevTab()">
-          <i class="bi bi-chevron-left me-1"></i>Atrás
+          Atrás
         </button>
       }
       @if (activeTab < tabLabels.length - 1) {

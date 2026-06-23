@@ -44,9 +44,9 @@
 
     <!-- AC-05: Botón Agregar -->
     <div class="col-md-2">
-      <button class="btn btn-outline-primary w-100" [disabled]="!selectedRetentionType || !selectedRetentionCode"
-        (click)="addRetention()">
-        <i class="bi bi-plus-lg me-1"></i>Agregar
+      <button class="btn btn-outline-primary w-100 d-flex align-items-center justify-content-center"
+        [disabled]="!selectedRetentionType || !selectedRetentionCode" (click)="addRetention()">
+        Agregar
       </button>
     </div>
   </div>
