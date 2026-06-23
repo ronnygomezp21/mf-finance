@@ -4,6 +4,7 @@
 import { Component, inject, OnInit, ViewChild } from '@angular/core';
 import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 
 /** PubSub viene como singleton compartido vía Module Federation desde el shell */
 declare const PubSub: { publish(channel: string, data?: any): boolean };
@@ -13,6 +14,8 @@ import { CatalogValueI } from '../../services/supplier.service';
 import { SupplierDetailI } from '../../interfaces/supplier-detail.interface';
 import { UpdateSupplierPayloadI } from '../../interfaces/update-supplier.interface';
 import { AddedRetentionI, RetentionsFormComponent } from '../../forms/retentions-form/retentions-form.component';
+import { SupplierSuccessModalComponent } from '../../components/success-modal/success-modal.component';
+import { buildSupplierSuccessSummary } from '../../helpers/supplier-success-summary.helper';
 import {
   CONTRIBUTOR_TYPES, FREQUENCIES, CONTACT_TYPES, RESIDENCIES,
   IDENTIFICATION_TYPES, COUNTRIES, PROVINCES, CITIES, ACTIVITY_TYPES,
@@ -38,6 +41,7 @@ export class EditComponent implements OnInit {
   private readonly fb = inject(FormBuilder);
   private readonly router = inject(Router);
   private readonly supplierService = inject(SupplierService);
+  private readonly modalService = inject(NgbModal);
   /** [FEAT #018] Lectura de sesión del usuario logueado */
   private readonly storageService = inject(StorageService);
 
@@ -534,9 +538,34 @@ export class EditComponent implements OnInit {
     const payload = this.buildPayload(this.pendingRetentions, reason, sessionUser);
 
     this.supplierService.updateSupplier(this.supplierId, payload).subscribe({
-      next: () => {
-        PubSub.publish('success', 'Proveedor actualizado correctamente');
-        this.router.navigateByUrl('/supplier/list');
+      next: (res) => {
+        this.isSubmitting = false;
+        const data = res?.data;
+        const g = this.generalForm.getRawValue();
+        const f = this.fiscalForm.getRawValue();
+        const b = this.bankingForm.getRawValue();
+        const contacts = (this.contactsForm.get('contacts') as FormArray).value;
+        const mainContact = contacts.find((c: { name?: string }) => c.name?.trim());
+
+        this.openSuccessModal(
+          'Proveedor actualizado',
+          'Los cambios del proveedor se guardaron correctamente y quedan disponibles para los demás módulos.',
+          'edit',
+          buildSupplierSuccessSummary({
+            supplierCode: data?.supplierCode ?? this.supplierCode,
+            name: data?.name ?? g.name ?? this.supplier?.name,
+            contributorTypeId: g.contributorType,
+            residencyId: g.residency,
+            identificationTypeId: g.identificationType,
+            identification: g.identification,
+            classificationId: g.classification,
+            paymentMethodId: b.paymentMethod,
+            mainContact: mainContact?.name,
+            mainEmail: f.email,
+            quotaAssigned: this.isFrequencyOccasional ? Number(g.quotaAssigned) : undefined,
+            retentionsCount: this.pendingRetentions.length,
+          }),
+        );
       },
       error: () => {
         this.isSubmitting = false;
@@ -649,5 +678,25 @@ export class EditComponent implements OnInit {
         email: sessionUser.email
       },
     };
+  }
+
+  private openSuccessModal(
+    title: string,
+    subtitle: string,
+    mode: 'create' | 'edit',
+    summary: ReturnType<typeof buildSupplierSuccessSummary>,
+  ): void {
+    const modalRef = this.modalService.open(SupplierSuccessModalComponent, {
+      centered: true,
+      backdrop: 'static',
+      modalDialogClass: 'modal-window-modal-supplier-success',
+    });
+    modalRef.componentInstance.title = title;
+    modalRef.componentInstance.subtitle = subtitle;
+    modalRef.componentInstance.mode = mode;
+    modalRef.componentInstance.summary = summary;
+    modalRef.closed.subscribe(() => {
+      this.router.navigateByUrl('/supplier/list');
+    });
   }
 }

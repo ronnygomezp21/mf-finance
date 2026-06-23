@@ -13,6 +13,7 @@ import { EditComponent } from './pages/edit/edit.component';
 // Components
 import { SupplierTabsComponent } from './components/supplier-tabs/supplier-tabs.component';
 import { ReasonModalComponent } from './components/reason-modal/reason-modal.component';
+import { SupplierSuccessModalComponent } from './components/success-modal/success-modal.component';
 
 // Forms
 import { GeneralFormComponent } from './forms/general-form/general-form.component';
@@ -32,6 +33,7 @@ import { RetentionsFormComponent } from './forms/retentions-form/retentions-form
     // Components
     SupplierTabsComponent,
     ReasonModalComponent,
+    SupplierSuccessModalComponent,
     // Forms
     GeneralFormComponent,
     FiscalFormComponent,

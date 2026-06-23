@@ -66,6 +66,7 @@ import { NeoLibComponentsModule } from '@neocore/lib-components';
     InitialModalComponent,
     NeoLibComponentsModule,
     SharedStepperComponent,
+    NgbModule,
     // From mf-authentication
   ],
   providers: [

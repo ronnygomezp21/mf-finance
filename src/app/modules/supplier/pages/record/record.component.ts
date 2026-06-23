@@ -4,6 +4,7 @@
 import { Component, inject, OnInit, ViewChild } from '@angular/core';
 import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 
 /** PubSub viene como singleton compartido vía Module Federation desde el shell */
 declare const PubSub: { publish(channel: string, data?: any): boolean };
@@ -11,6 +12,8 @@ declare const PubSub: { publish(channel: string, data?: any): boolean };
 import { SupplierService } from '../../services/supplier.service';
 import { CreateSupplierPayloadI } from '../../interfaces/create-supplier.interface';
 import { AddedRetentionI, RetentionsFormComponent } from '../../forms/retentions-form/retentions-form.component';
+import { SupplierSuccessModalComponent } from '../../components/success-modal/success-modal.component';
+import { buildSupplierSuccessSummary } from '../../helpers/supplier-success-summary.helper';
 import {
   CONTRIBUTOR_TYPES, FREQUENCIES, CONTACT_TYPES, RESIDENCIES,
   IDENTIFICATION_TYPES, COUNTRIES, PROVINCES, CITIES, ACTIVITY_TYPES,
@@ -36,6 +39,7 @@ export class RecordComponent implements OnInit {
   private readonly fb = inject(FormBuilder);
   private readonly router = inject(Router);
   private readonly supplierService = inject(SupplierService);
+  private readonly modalService = inject(NgbModal);
   /** [FEAT #018] Lectura de sesión del usuario logueado */
   private readonly storageService = inject(StorageService);
 
@@ -445,15 +449,63 @@ export class RecordComponent implements OnInit {
     };
 
     this.supplierService.createSupplier(payload).subscribe({
-      next: () => {
-        PubSub.publish('success', 'Proveedor creado correctamente');
-        this.router.navigateByUrl('/supplier/list');
+      next: (res) => {
+        this.isSubmitting = false;
+        const data = res?.data;
+        const g = this.generalForm.getRawValue();
+        const f = this.fiscalForm.getRawValue();
+        const b = this.bankingForm.getRawValue();
+        const mainContact = contacts.find((c: { name?: string }) => c.name?.trim());
+
+        this.openSuccessModal(
+          'Proveedor registrado',
+          'El proveedor se creó correctamente y queda disponible para los demás módulos.',
+          'create',
+          buildSupplierSuccessSummary({
+            supplierCode: data?.supplierCode,
+            name: data?.name ?? g.name,
+            contributorTypeId: g.contributorType,
+            residencyId: g.residency,
+            identificationTypeId: g.identificationType,
+            identification: g.identification,
+            classificationId: g.classification,
+            paymentMethodId: b.paymentMethod,
+            mainContact: mainContact?.name,
+            mainEmail: f.email,
+            quotaAssigned: this.isFrequencyOccasional ? Number(g.quotaAssigned) : undefined,
+            retentionsCount: retentions.length,
+          }),
+        );
       },
       error: (err) => {
         this.isSubmitting = false;
         const message = err?.error?.message || 'Error al crear el proveedor';
         console.error('[Supplier Record] Error:', message);
       },
+    });
+  }
+
+  private openSuccessModal(
+    title: string,
+    subtitle: string,
+    mode: 'create' | 'edit',
+    summary: ReturnType<typeof buildSupplierSuccessSummary>,
+  ): void {
+    const modalRef = this.modalService.open(SupplierSuccessModalComponent, {
+      centered: true,
+      backdrop: 'static',
+      modalDialogClass: 'modal-window-modal-supplier-success',
+    });
+    modalRef.componentInstance.title = title;
+    modalRef.componentInstance.subtitle = subtitle;
+    modalRef.componentInstance.mode = mode;
+    modalRef.componentInstance.summary = summary;
+    modalRef.closed.subscribe((action: 'list' | 'create-another') => {
+      if (action === 'create-another') {
+        this.router.navigateByUrl('/supplier/record');
+        return;
+      }
+      this.router.navigateByUrl('/supplier/list');
     });
   }
 }
