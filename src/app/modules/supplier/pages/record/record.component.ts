@@ -494,7 +494,7 @@ export class RecordComponent implements OnInit {
     const modalRef = this.modalService.open(SupplierSuccessModalComponent, {
       centered: true,
       backdrop: 'static',
-      modalDialogClass: 'modal-window-modal-supplier-success',
+      modalDialogClass: 'modal-sm-v6',
     });
     modalRef.componentInstance.title = title;
     modalRef.componentInstance.subtitle = subtitle;
